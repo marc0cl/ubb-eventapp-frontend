@@ -156,9 +156,16 @@ const EventsPage = () => {
                 visibilidad: formData.visibilidad ? 'PUBLICO' : 'PRIVADO'
             };
             if (editingId) {
-                await eventService.updateEvent({ ...data, id: editingId });
+                await eventService.updateEvent({
+                    ...data,
+                    id: editingId,
+                    creadorId: userId
+                });
             } else {
-                await eventService.createEvent(data);
+                await eventService.createEvent({
+                    ...data,
+                    creadorId: userId
+                });
             }
             setFormOpen(false);
             setFormData({ titulo: '', descripcion: '', fechaInicio: '', fechaFin: '', lugar: '', aforoMax: '', visibilidad: true });
