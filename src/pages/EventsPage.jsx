@@ -260,6 +260,9 @@ const EventsPage = () => {
                             registered={registeredIds.includes(ev.id)}
                             onRegister={handleRegister}
                             onCancel={handleCancel}
+                            editable={role === 'ADMINISTRADOR'}
+                            onEdit={openForEdit}
+                            onDelete={handleDelete}
                         />
                     ))}
                 {tab === 1 && myEvents.map((ev) => (
