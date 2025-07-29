@@ -18,14 +18,7 @@ import {
 } from '@mui/material';
 import eventService from '../services/eventService';
 import { UBB_COLORS } from '../styles/colors';
-
-const parseJwt = (token) => {
-    try {
-        return JSON.parse(atob(token.split('.')[1]));
-    } catch (e) {
-        return null;
-    }
-};
+import { getUserIdFromToken, getRoleFromToken } from '../utils/auth';
 
 const EventCard = ({
     event,
@@ -48,7 +41,7 @@ const EventCard = ({
                 {new Date(event.fechaFin).toLocaleString()}
             </Typography>
             <Typography variant="body2">{event.lugar}</Typography>
-            {event.estado === 'PENDIENTE' && (
+            {event.estadoValidacion === 'PENDIENTE' && (
                 <Typography variant="caption" color="orange">
                     Pendiente de aprobación
                 </Typography>
@@ -101,7 +94,7 @@ const EventsPage = () => {
         fechaFin: '',
         lugar: '',
         aforoMax: '',
-        publico: true
+        visibilidad: true
     });
     const [editingId, setEditingId] = useState(null);
 
@@ -111,8 +104,8 @@ const EventsPage = () => {
                 const token = localStorage.getItem('accessToken');
                 if (!token) return;
                 const payload = parseJwt(token);
-                const uid = payload?.id || payload?.userId || payload?.sub;
-                const userRole = payload?.role || payload?.roles?.[0];
+                const uid = getUserIdFromToken(token);
+                const userRole = getRoleFromToken(token);
                 setRole(userRole);
                 setUserId(uid);
 
@@ -153,14 +146,14 @@ const EventsPage = () => {
 
     const handleCreateOrUpdate = async () => {
         try {
-            const data = { ...formData, aforoMax: Number(formData.aforoMax), publico: formData.publico };
+            const data = { ...formData, aforoMax: Number(formData.aforoMax), visibilidad: formData.visibilidad };
             if (editingId) {
                 await eventService.updateEvent({ ...data, id: editingId });
             } else {
                 await eventService.createEvent(data);
             }
             setFormOpen(false);
-            setFormData({ titulo: '', descripcion: '', fechaInicio: '', fechaFin: '', lugar: '', aforoMax: '', publico: true });
+            setFormData({ titulo: '', descripcion: '', fechaInicio: '', fechaFin: '', lugar: '', aforoMax: '', visibilidad: true });
             setEditingId(null);
             await refreshAll();
         } catch (err) {
@@ -219,7 +212,7 @@ const EventsPage = () => {
             fechaFin: ev.fechaFin,
             lugar: ev.lugar,
             aforoMax: ev.aforoMax,
-            publico: ev.publico !== false
+            visibilidad: ev.visibilidad !== false
         });
         setFormOpen(true);
     };
@@ -311,8 +304,8 @@ const EventsPage = () => {
                     <FormControlLabel
                         control={
                             <Checkbox
-                                checked={formData.publico}
-                                onChange={(e) => setFormData({ ...formData, publico: e.target.checked })}
+                                checked={formData.visibilidad}
+                                onChange={(e) => setFormData({ ...formData, visibilidad: e.target.checked })}
                                 color="primary"
                             />
                         }

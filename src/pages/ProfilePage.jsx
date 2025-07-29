@@ -11,14 +11,7 @@ import {
 import { Users, Trophy, CalendarCheck } from 'lucide-react';
 import { UBB_COLORS } from '../styles/colors';
 import userService from '../services/userService';
-
-const parseJwt = (token) => {
-    try {
-        return JSON.parse(atob(token.split('.')[1]));
-    } catch {
-        return null;
-    }
-};
+import { getUserIdFromToken } from '../utils/auth';
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
@@ -29,8 +22,7 @@ const ProfilePage = () => {
         const load = async () => {
             const token = localStorage.getItem('accessToken');
             if (!token) return;
-            const payload = parseJwt(token);
-            const userId = payload?.id || payload?.userId || payload?.sub;
+            const userId = getUserIdFromToken(token);
             if (!userId) return;
             try {
                 const usr = await userService.getUser(userId);
