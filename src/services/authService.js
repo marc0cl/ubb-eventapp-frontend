@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import axiosInstance from './axiosInstance';
 
 const authService = {
     login: async (email, password) => {
-        const response = await axios.post(`${API_URL}/auth/login`, {
+        const response = await axiosInstance.post('/auth/login', {
             email,
             password
         });
@@ -12,7 +10,7 @@ const authService = {
     },
 
     register: async (userData) => {
-        const response = await axios.post(`${API_URL}/auth/register`, userData);
+        const response = await axiosInstance.post('/auth/register', userData);
         return response.data;
     },
 
@@ -20,11 +18,7 @@ const authService = {
         const token = localStorage.getItem('accessToken');
         try {
             if (token) {
-                await axios.post(
-                    `${API_URL}/auth/logout`,
-                    {},
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
+                await axiosInstance.post('/auth/logout');
             }
         } catch (err) {
             console.error('Failed to logout from API:', err);

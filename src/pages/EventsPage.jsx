@@ -109,6 +109,7 @@ const EventsPage = () => {
         const load = async () => {
             try {
                 const token = localStorage.getItem('accessToken');
+                if (!token) return;
                 const payload = parseJwt(token);
                 const uid = payload?.id || payload?.userId || payload?.sub;
                 const userRole = payload?.role || payload?.roles?.[0];
