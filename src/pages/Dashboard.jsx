@@ -230,7 +230,7 @@ const Dashboard = ({ onLogout }) => {
                             { icon: Calendar, title: 'Mi Calendario', desc: 'Ver todos mis eventos programados', path: '/calendar', color: UBB_COLORS.primary },
                             { icon: CalendarDays, title: 'Explorar Eventos', desc: 'Descubre nuevas actividades', path: '/events', color: UBB_COLORS.secondary },
                             { icon: User, title: 'Mi Perfil', desc: 'Ver logros y estadísticas', path: '/profile', color: '#8B5CF6' },
-                            { icon: Users, title: 'Comunidad', desc: 'Conecta con otros estudiantes', path: '/events', color: '#10B981' }
+                            { icon: Users, title: 'Comunidad', desc: 'Conecta con otros estudiantes', path: '/friends', color: '#10B981' }
                         ].map((item, index) => (
                             <button
                                 key={index}
