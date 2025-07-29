@@ -17,12 +17,12 @@ const userService = {
         const res = await axiosInstance.get(`/users/${id}/recommendations`);
         return res.data;
     },
-    getPendingRequests: async (userId) => {
-        const res = await axiosInstance.get(`/users/pending/${userId}`);
+    getPendingFriendRequests: async (userId) => {
+        const res = await axiosInstance.get(`/friendships/pending/${userId}`);
         return res.data;
     },
-    sendFriendRequest: async (userId, friendId) => {
-        const res = await axiosInstance.post(`/friendships`, { userId, friendId });
+    sendFriendRequest: async (user1, user2) => {
+        const res = await axiosInstance.post(`/friendships`, { friendship: {  user1, user2 } });
         return res.data;
     },
     acceptFriendRequest: async (userId, friendId) => {

@@ -33,7 +33,7 @@ const FriendsPage = () => {
       try {
         const [rec, pend] = await Promise.all([
           userService.getRecommendations(uid),
-          userService.getPendingRequests(uid)
+          userService.getPendingFriendRequests(uid)
         ]);
         setRecommendations(rec || []);
         setPending(pend || []);
