@@ -19,7 +19,9 @@ const AuthPage = () => {
     });
 
     const [registerData, setRegisterData] = useState({
-        email: '',
+        emailPrefix: '',
+        emailDomain: 'alumnos.ubiobio.cl',
+        isExternal: false,
         password: '',
         confirmPassword: '',
         username: '',
@@ -63,7 +65,9 @@ const AuthPage = () => {
         setError('');
         setSuccess('');
 
-        if (!validateUBBEmail(registerData.email)) {
+        const email = `${registerData.emailPrefix}@${registerData.emailDomain}`;
+
+        if (!validateUBBEmail(email)) {
             setError('Debes usar un correo institucional UBB (@alumnos.ubiobio.cl o @ubiobio.cl)');
             return;
         }
@@ -81,7 +85,12 @@ const AuthPage = () => {
         setLoading(true);
 
         try {
-            const { confirmPassword, ...dataToSend } = registerData;
+            const { confirmPassword, emailPrefix, emailDomain, isExternal, ...rest } = registerData;
+            const dataToSend = {
+                ...rest,
+                email,
+                isExternal
+            };
             const data = await authService.register(dataToSend);
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
@@ -288,19 +297,60 @@ const AuthPage = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Correo Institucional
                                         </label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type="email"
-                                                value={registerData.email}
-                                                onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
-                                                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                        <div className="flex">
+                                            <div className="relative flex-grow">
+                                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                <input
+                                                    type="text"
+                                                    value={registerData.emailPrefix}
+                                                    onChange={(e) => setRegisterData({...registerData, emailPrefix: e.target.value})}
+                                                    className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                                    style={{'--tw-ring-color': UBB_COLORS.primary}}
+                                                    placeholder="tu.correo"
+                                                    required
+                                                />
+                                            </div>
+                                            <select
+                                                value={registerData.emailDomain}
+                                                onChange={(e) => setRegisterData({...registerData, emailDomain: e.target.value, isExternal: false})}
+                                                className="ml-2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
                                                 style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="tu.correo@alumnos.ubiobio.cl"
-                                                required
-                                            />
+                                            >
+                                                <option value="alumnos.ubiobio.cl">@alumnos.ubiobio.cl</option>
+                                                <option value="ubiobio.cl">@ubiobio.cl</option>
+                                            </select>
                                         </div>
                                     </div>
+
+                                    {registerData.emailDomain === 'ubiobio.cl' && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                ¿Eres externo?
+                                            </label>
+                                            <div className="flex items-center space-x-4">
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="isExternal"
+                                                        className="mr-2"
+                                                        checked={registerData.isExternal}
+                                                        onChange={() => setRegisterData({...registerData, isExternal: true})}
+                                                    />
+                                                    Sí
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="isExternal"
+                                                        className="mr-2"
+                                                        checked={!registerData.isExternal}
+                                                        onChange={() => setRegisterData({...registerData, isExternal: false})}
+                                                    />
+                                                    No
+                                                </label>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
