@@ -198,7 +198,7 @@ const AuthPage = ({ onLogin }) => {
                         />
                     </Tabs>
 
-                    <Box component="form" onSubmit={tab === 0 ? handleLogin : handleRegister} sx={{ p: 3 }}>
+                    <Box sx={{ p: 3 }}>
                         {error && (
                             <Alert severity="error" sx={{ mb: 2 }}>
                                 {error}
@@ -211,7 +211,7 @@ const AuthPage = ({ onLogin }) => {
                         )}
 
                         {tab === 0 ? (
-                            <>
+                            <form onSubmit={handleLogin}>
                                 <TextField
                                     label="Correo Institucional"
                                     type="email"
@@ -264,7 +264,7 @@ const AuthPage = ({ onLogin }) => {
                                 >
                                     {loading ? 'Ingresando...' : 'Ingresar'}
                                 </Button>
-                            </>
+                            </form>
                         ) : (
                             // Formulario de Registro
                             <form onSubmit={handleRegister}>
