@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import eventService from '../services/eventService';
 import { UBB_COLORS } from '../styles/colors';
 import { getUserIdFromToken } from '../utils/auth';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 const CalendarPage = () => {
     const navigate = useNavigate();
@@ -20,17 +21,21 @@ const CalendarPage = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [loading, setLoading] = useState(true);
     const [todayEvents, setTodayEvents] = useState([]);
+    const [userId, setUserId] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchEvents = async () => {
             setLoading(true);
             const token = localStorage.getItem('accessToken');
             if (!token) return;
-            const userId = getUserIdFromToken(token);
-            if (!userId) return;
+            const uid = getUserIdFromToken(token);
+            if (!uid) return;
+            setUserId(uid);
 
             try {
-                const toAttend = await eventService.getEventsToAttend(userId);
+                const toAttend = await eventService.getEventsToAttend(uid);
                 if (toAttend.eventIds && toAttend.eventIds.length > 0) {
                     const data = await eventService.getEventsByIds(toAttend.eventIds);
                     setEvents(data);
@@ -99,6 +104,39 @@ const CalendarPage = () => {
     // Generar las 24 horas del día
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
+    const refreshEvents = async () => {
+        if (!userId) return;
+        try {
+            const toAttend = await eventService.getEventsToAttend(userId);
+            if (toAttend.eventIds && toAttend.eventIds.length > 0) {
+                const data = await eventService.getEventsByIds(toAttend.eventIds);
+                setEvents(data);
+            } else {
+                setEvents([]);
+            }
+        } catch (err) {
+            console.error('Error fetching events', err);
+        }
+    };
+
+    const handleEventClick = (event) => {
+        setSelectedEvent(event);
+        setModalOpen(true);
+    };
+
+    const handleCancel = async () => {
+        if (!selectedEvent) return;
+        try {
+            await eventService.cancelRegistration(selectedEvent.id, userId);
+            await refreshEvents();
+        } catch (err) {
+            console.error('Error cancelling registration', err);
+        } finally {
+            setModalOpen(false);
+            setSelectedEvent(null);
+        }
+    };
+
     const EventCard = ({ event, isPast }) => (
         <div
             style={{
@@ -117,7 +155,7 @@ const CalendarPage = () => {
                 opacity: isPast ? 0.6 : 1,
                 overflow: 'hidden'
             }}
-            onClick={() => !isPast && navigate(`/events/${event.id}`)}
+            onClick={() => !isPast && handleEventClick(event)}
             onMouseEnter={(e) => {
                 if (!isPast) {
                     e.currentTarget.style.transform = 'translateX(-4px)';
@@ -467,6 +505,28 @@ const CalendarPage = () => {
                     </div>
                 )}
             </div>
+            <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
+                <DialogTitle>{selectedEvent?.titulo}</DialogTitle>
+                <DialogContent dividers>
+                    {selectedEvent && (
+                        <div>
+                            <p><strong>Descripción:</strong> {selectedEvent.descripcion}</p>
+                            <p>
+                                <strong>Fecha:</strong>{' '}
+                                {new Date(selectedEvent.fechaInicio).toLocaleString()} -{' '}
+                                {new Date(selectedEvent.fechaFin).toLocaleString()}
+                            </p>
+                            <p><strong>Lugar:</strong> {selectedEvent.lugar}</p>
+                        </div>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setModalOpen(false)}>Cerrar</Button>
+                    <Button onClick={handleCancel} color="error" variant="contained">
+                        Cancelar inscripción
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };
