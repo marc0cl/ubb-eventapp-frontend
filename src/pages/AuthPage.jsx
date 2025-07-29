@@ -59,9 +59,20 @@ const AuthPage = ({ onLogin }) => {
         setLoading(true);
 
         try {
-            const data = await authService.login(loginData.email, loginData.password);
-            localStorage.setItem('accessToken', data.accessToken);
-            localStorage.setItem('refreshToken', data.refreshToken);
+            const data = await authService.login(
+                loginData.email,
+                loginData.password
+            );
+            const accessToken =
+                data.accessToken || data.access_token || data.token || '';
+            const refreshToken =
+                data.refreshToken || data.refresh_token || '';
+            if (accessToken) {
+                localStorage.setItem('accessToken', accessToken);
+            }
+            if (refreshToken) {
+                localStorage.setItem('refreshToken', refreshToken);
+            }
             if (onLogin) onLogin();
             setSuccess('¡Inicio de sesión exitoso! Redirigiendo...');
             setTimeout(() => {
@@ -110,8 +121,16 @@ const AuthPage = ({ onLogin }) => {
                 isExternal
             };
             const data = await authService.register(dataToSend);
-            localStorage.setItem('accessToken', data.accessToken);
-            localStorage.setItem('refreshToken', data.refreshToken);
+            const accessToken =
+                data.accessToken || data.access_token || data.token || '';
+            const refreshToken =
+                data.refreshToken || data.refresh_token || '';
+            if (accessToken) {
+                localStorage.setItem('accessToken', accessToken);
+            }
+            if (refreshToken) {
+                localStorage.setItem('refreshToken', refreshToken);
+            }
             if (onLogin) onLogin();
             setSuccess('¡Registro exitoso! Redirigiendo...');
             setTimeout(() => {
