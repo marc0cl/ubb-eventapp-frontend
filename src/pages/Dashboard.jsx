@@ -114,7 +114,7 @@ const Dashboard = ({ onLogout }) => {
                                 <Calendar style={{ color: 'white' }} size={24} />
                             </div>
                             <div>
-                                <h1 style={{ fontWeight: 'bold', color: '#1f2937', margin: 0 }}>Portal de Eventos UBB</h1>
+                                <h1 style={{ fontWeight: 'bold', color: '#1f2937', margin: 0 }}>Eventos UBB</h1>
                                 <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>Tu calendario universitario</p>
                             </div>
                         </div>

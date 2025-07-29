@@ -359,7 +359,7 @@ const AuthPage = ({ onLogin }) => {
                         <Calendar color="white" size={36} />
                     </div>
                     <h1 style={styles.title}>
-                        Portal de Eventos UBB
+                        Eventos UBB
                     </h1>
                     <p style={styles.subtitle}>
                         Tu calendario universitario en un solo lugar

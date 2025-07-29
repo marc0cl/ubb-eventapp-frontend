@@ -531,7 +531,7 @@ const FriendsPage = () => {
                 Volver
               </button>
               <div style={{ width: '1px', height: '24px', backgroundColor: '#e5e7eb' }} />
-              <h1 style={styles.title}>Comunidad UBB</h1>
+              <h1 style={styles.title}>Comunidad</h1>
             </div>
           </div>
         </header>
