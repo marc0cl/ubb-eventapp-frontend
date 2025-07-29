@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import CalendarPage from './pages/CalendarPage';
 import EventsPage from './pages/EventsPage';
 import ProfilePage from './pages/ProfilePage';
+import FriendsPage from './pages/FriendsPage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -44,6 +45,10 @@ function App() {
         <Route
           path="/events"
           element={isAuthenticated ? <EventsPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/friends"
+          element={isAuthenticated ? <FriendsPage /> : <Navigate to="/" />}
         />
         <Route
           path="/profile"
