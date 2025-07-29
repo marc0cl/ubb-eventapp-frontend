@@ -22,8 +22,10 @@ const eventService = {
     },
 
     getUpcomingEvents: async () => {
-        const now = new Date().toISOString();
-        const response = await axios.get(`${API_URL}/events/upcoming?after=${encodeURIComponent(now)}`);
+        const now = new Date().toISOString().replace('Z', '');
+        const response = await axios.get(`${API_URL}/events/upcoming?after=${encodeURIComponent(now)}`, {
+            headers: getAuthHeaders()
+        });
         return response.data;
     },
 
