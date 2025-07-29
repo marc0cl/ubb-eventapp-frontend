@@ -95,7 +95,8 @@ const EventsPage = () => {
         fechaFin: '',
         lugar: '',
         aforoMax: '',
-        visibilidad: true
+        visibilidad: true,
+        origenTipo: 'USUARIO'
     });
     const [editingId, setEditingId] = useState(null);
     const [page, setPage] = useState(1);
@@ -156,12 +157,19 @@ const EventsPage = () => {
                 visibilidad: formData.visibilidad ? 'PUBLICO' : 'PRIVADO'
             };
             if (editingId) {
-                await eventService.updateEvent({ ...data, id: editingId });
+                await eventService.updateEvent({
+                    ...data,
+                    id: editingId,
+                    creadorId: userId
+                });
             } else {
-                await eventService.createEvent(data);
+                await eventService.createEvent({
+                    ...data,
+                    creadorId: userId
+                });
             }
             setFormOpen(false);
-            setFormData({ titulo: '', descripcion: '', fechaInicio: '', fechaFin: '', lugar: '', aforoMax: '', visibilidad: true });
+            setFormData({ titulo: '', descripcion: '', fechaInicio: '', fechaFin: '', lugar: '', aforoMax: '', visibilidad: true, origenTipo: 'USUARIO' });
             setEditingId(null);
             await refreshAll();
         } catch (err) {
@@ -220,7 +228,8 @@ const EventsPage = () => {
             fechaFin: ev.fechaFin,
             lugar: ev.lugar,
             aforoMax: ev.aforoMax,
-            visibilidad: ev.visibilidad === 'PUBLICO'
+            visibilidad: ev.visibilidad === 'PUBLICO',
+            origenTipo: ev.origenTipo || 'USUARIO'
         });
         setFormOpen(true);
     };
@@ -321,6 +330,19 @@ const EventsPage = () => {
                         value={formData.aforoMax}
                         onChange={(e) => setFormData({ ...formData, aforoMax: e.target.value })}
                     />
+                    <TextField
+                        margin="dense"
+                        label="Origen"
+                        select
+                        fullWidth
+                        value={formData.origenTipo}
+                        onChange={(e) => setFormData({ ...formData, origenTipo: e.target.value })}
+                        SelectProps={{ native: true }}
+                    >
+                        <option value="USUARIO">USUARIO</option>
+                        <option value="GRUPO">GRUPO</option>
+                        <option value="OTRO">OTRO</option>
+                    </TextField>
                     <FormControlLabel
                         control={
                             <Checkbox
