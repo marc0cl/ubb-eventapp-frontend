@@ -26,10 +26,227 @@ const AuthPage = ({ onLogin }) => {
         lastName: ''
     });
 
+    // Estilos según las especificaciones
+    const styles = {
+        container: {
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#f9fafb',
+            padding: '16px'
+        },
+        card: {
+            width: '100%',
+            maxWidth: '480px'
+        },
+        header: {
+            textAlign: 'center',
+            marginBottom: '32px'
+        },
+        logoContainer: {
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '64px',
+            height: '64px',
+            borderRadius: '16px',
+            marginBottom: '16px',
+            background: `linear-gradient(135deg, ${UBB_COLORS.primary} 0%, ${UBB_COLORS.primaryDark} 100%)`,
+            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
+        },
+        title: {
+            fontSize: '32px',
+            fontWeight: 'bold',
+            color: '#1f2937',
+            marginBottom: '8px',
+            lineHeight: '1.2'
+        },
+        subtitle: {
+            color: '#6b7280',
+            fontSize: '16px',
+            lineHeight: '1.5'
+        },
+        cardContainer: {
+            backgroundColor: 'white',
+            borderRadius: '16px',
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+            border: '1px solid #e5e7eb',
+            overflow: 'hidden'
+        },
+        tabContainer: {
+            display: 'flex',
+            backgroundColor: '#f9fafb',
+            borderBottom: '1px solid #e5e7eb'
+        },
+        tab: {
+            flex: 1,
+            padding: '20px 24px',
+            fontSize: '16px',
+            fontWeight: '600',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            position: 'relative'
+        },
+        activeTab: {
+            backgroundColor: 'white',
+            color: UBB_COLORS.primary,
+            borderBottom: `3px solid ${UBB_COLORS.primary}`
+        },
+        inactiveTab: {
+            backgroundColor: 'transparent',
+            color: '#6b7280'
+        },
+        formContainer: {
+            padding: '40px 32px'
+        },
+        alert: {
+            marginBottom: '32px',
+            padding: '20px',
+            borderRadius: '12px',
+            fontSize: '14px',
+            fontWeight: '500'
+        },
+        errorAlert: {
+            backgroundColor: '#fef2f2',
+            border: '1px solid #fecaca',
+            color: '#b91c1c'
+        },
+        successAlert: {
+            backgroundColor: '#f0fdf4',
+            border: '1px solid #bbf7d0',
+            color: '#15803d'
+        },
+        formGroup: {
+            marginBottom: '36px'
+        },
+        label: {
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '12px'
+        },
+        inputContainer: {
+            position: 'relative'
+        },
+        input: {
+            width: '100%',
+            padding: '20px 18px',
+            paddingLeft: '52px',
+            border: '1px solid #d1d5db',
+            borderRadius: '12px',
+            fontSize: '16px',
+            transition: 'all 0.2s',
+            outline: 'none',
+            backgroundColor: 'white',
+            lineHeight: '1.5',
+            boxSizing: 'border-box'
+        },
+        inputFocus: {
+            borderColor: UBB_COLORS.primary,
+            boxShadow: `0 0 0 3px ${UBB_COLORS.primary}20`
+        },
+        inputIcon: {
+            position: 'absolute',
+            left: '16px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#9ca3af'
+        },
+        eyeIcon: {
+            position: 'absolute',
+            right: '16px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#9ca3af',
+            cursor: 'pointer',
+            padding: '4px',
+            borderRadius: '4px',
+            transition: 'color 0.2s'
+        },
+        button: {
+            width: '100%',
+            padding: '20px 16px',
+            borderRadius: '12px',
+            fontSize: '16px',
+            fontWeight: '600',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            position: 'relative',
+            overflow: 'hidden',
+            marginTop: '16px'
+        },
+        primaryButton: {
+            backgroundColor: UBB_COLORS.primary,
+            color: 'white',
+            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
+        },
+        disabledButton: {
+            backgroundColor: UBB_COLORS.gray,
+            cursor: 'not-allowed',
+            opacity: 0.7
+        },
+        gridCols2: {
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '24px',
+            marginBottom: '12px'
+        },
+        emailGrid: {
+            display: 'flex',
+            gap: '12px'
+        },
+        select: {
+            padding: '20px 18px',
+            border: '1px solid #d1d5db',
+            borderRadius: '12px',
+            fontSize: '16px',
+            backgroundColor: 'white',
+            cursor: 'pointer',
+            minWidth: '180px',
+            lineHeight: '1.5',
+            boxSizing: 'border-box'
+        },
+        radioGroup: {
+            display: 'flex',
+            gap: '24px',
+            marginTop: '12px'
+        },
+        radioLabel: {
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            fontSize: '14px',
+            color: '#374151'
+        },
+        radio: {
+            marginRight: '8px',
+            accentColor: UBB_COLORS.primary
+        },
+        footer: {
+            fontSize: '12px',
+            color: '#9ca3af',
+            textAlign: 'center',
+            marginTop: '24px'
+        }
+    };
+
     const handleTabChange = (_e, value) => {
         setTab(value);
         setError('');
         setSuccess('');
+    };
+
+    const handleInputFocus = (e) => {
+        Object.assign(e.target.style, styles.inputFocus);
+    };
+
+    const handleInputBlur = (e) => {
+        e.target.style.borderColor = '#d1d5db';
+        e.target.style.boxShadow = 'none';
     };
 
     const handleLogin = async (e) => {
@@ -134,70 +351,30 @@ const AuthPage = ({ onLogin }) => {
     };
 
     return (
-        <div
-            style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#f9fafb',
-                padding: '16px'
-            }}
-        >
-            <div style={{ width: '100%', maxWidth: '400px' }}>
-                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                    <div
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '56px',
-                            height: '56px',
-                            borderRadius: '12px',
-                            marginBottom: '8px',
-                            backgroundColor: UBB_COLORS.primary
-                        }}
-                    >
-                        <Calendar color="white" size={32} />
+        <div style={styles.container}>
+            <div style={styles.card}>
+                {/* Header */}
+                <div style={styles.header}>
+                    <div style={styles.logoContainer}>
+                        <Calendar color="white" size={36} />
                     </div>
-                    <h1
-                        style={{
-                            fontSize: '24px',
-                            fontWeight: 'bold',
-                            color: '#1f2937',
-                            marginBottom: '4px'
-                        }}
-                    >
+                    <h1 style={styles.title}>
                         Portal de Eventos UBB
                     </h1>
-                    <p style={{ color: '#6b7280', fontSize: '14px' }}>
+                    <p style={styles.subtitle}>
                         Tu calendario universitario en un solo lugar
                     </p>
                 </div>
 
-                <div
-                    style={{
-                        backgroundColor: 'white',
-                        borderRadius: '12px',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                        border: '1px solid #e5e7eb'
-                    }}
-                >
-                    <div style={{ display: 'flex' }}>
+                {/* Card */}
+                <div style={styles.cardContainer}>
+                    {/* Tabs */}
+                    <div style={styles.tabContainer}>
                         <button
                             onClick={() => handleTabChange(null, 0)}
                             style={{
-                                flex: 1,
-                                padding: '12px 0',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                border: 'none',
-                                cursor: 'pointer',
-                                backgroundColor: tab === 0 ? UBB_COLORS.primary : 'transparent',
-                                color: tab === 0 ? 'white' : '#6b7280',
-                                borderTopLeftRadius: '12px',
-                                borderTopRightRadius: '12px',
-                                transition: 'background-color 0.2s'
+                                ...styles.tab,
+                                ...(tab === 0 ? styles.activeTab : styles.inactiveTab)
                             }}
                         >
                             Iniciar Sesión
@@ -205,134 +382,110 @@ const AuthPage = ({ onLogin }) => {
                         <button
                             onClick={() => handleTabChange(null, 1)}
                             style={{
-                                flex: 1,
-                                padding: '12px 0',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                border: 'none',
-                                cursor: 'pointer',
-                                backgroundColor: tab === 1 ? UBB_COLORS.primary : 'transparent',
-                                color: tab === 1 ? 'white' : '#6b7280',
-                                borderTopLeftRadius: '12px',
-                                borderTopRightRadius: '12px',
-                                transition: 'background-color 0.2s'
+                                ...styles.tab,
+                                ...(tab === 1 ? styles.activeTab : styles.inactiveTab)
                             }}
                         >
                             Registrarse
                         </button>
                     </div>
 
-                    <div style={{ padding: '24px' }}>
+                    {/* Form Container */}
+                    <div style={styles.formContainer}>
+                        {/* Alerts */}
                         {error && (
-                            <div
-                                style={{
-                                    marginBottom: '16px',
-                                    padding: '12px',
-                                    borderRadius: '8px',
-                                    backgroundColor: '#fee2e2',
-                                    border: '1px solid #fecaca',
-                                    color: '#b91c1c',
-                                    fontSize: '14px'
-                                }}
-                            >
+                            <div style={{...styles.alert, ...styles.errorAlert}}>
                                 {error}
                             </div>
                         )}
                         {success && (
-                            <div
-                                style={{
-                                    marginBottom: '16px',
-                                    padding: '12px',
-                                    borderRadius: '8px',
-                                    backgroundColor: '#d1fae5',
-                                    border: '1px solid #a7f3d0',
-                                    color: '#047857',
-                                    fontSize: '14px'
-                                }}
-                            >
+                            <div style={{...styles.alert, ...styles.successAlert}}>
                                 {success}
                             </div>
                         )}
 
+                        {/* Login Form */}
                         {tab === 0 ? (
-                            <form onSubmit={handleLogin} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <form onSubmit={handleLogin}>
+                                <div style={styles.formGroup}>
+                                    <label style={styles.label}>
                                         Correo Institucional
                                     </label>
-                                    <div className="relative">
-                                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <div style={styles.inputContainer}>
+                                        <Mail style={styles.inputIcon} size={20} />
                                         <input
                                             type="email"
                                             value={loginData.email}
                                             onChange={(e) =>
                                                 setLoginData({ ...loginData, email: e.target.value })
                                             }
-                                            className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            style={styles.input}
+                                            onFocus={handleInputFocus}
+                                            onBlur={handleInputBlur}
+                                            placeholder="tu.correo@alumnos.ubiobio.cl"
                                             required
                                         />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <div style={styles.formGroup}>
+                                    <label style={styles.label}>
                                         Contraseña
                                     </label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <div style={styles.inputContainer}>
+                                        <Lock style={styles.inputIcon} size={20} />
                                         <input
                                             type={showPassword ? 'text' : 'password'}
                                             value={loginData.password}
                                             onChange={(e) =>
                                                 setLoginData({ ...loginData, password: e.target.value })
                                             }
-                                            className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            style={{...styles.input, paddingRight: '56px'}}
+                                            onFocus={handleInputFocus}
+                                            onBlur={handleInputBlur}
+                                            placeholder="••••••••"
                                             required
                                         />
-                                        <button
-                                            type="button"
+                                        <div
+                                            style={styles.eyeIcon}
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            onMouseEnter={(e) => e.target.style.color = '#6b7280'}
+                                            onMouseLeave={(e) => e.target.style.color = '#9ca3af'}
                                         >
-                                            {showPassword ? (
-                                                <EyeOff className="w-5 h-5" />
-                                            ) : (
-                                                <Eye className="w-5 h-5" />
-                                            )}
-                                        </button>
+                                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                        </div>
                                     </div>
                                 </div>
 
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     style={{
-                                        backgroundColor: loading
-                                            ? UBB_COLORS.gray
-                                            : UBB_COLORS.primary
+                                        ...styles.button,
+                                        ...(loading ? styles.disabledButton : styles.primaryButton)
                                     }}
-                                    onMouseEnter={(e) =>
-                                        !loading &&
-                                        (e.currentTarget.style.backgroundColor = UBB_COLORS.primaryDark)
-                                    }
-                                    onMouseLeave={(e) =>
-                                        !loading &&
-                                        (e.currentTarget.style.backgroundColor = UBB_COLORS.primary)
-                                    }
+                                    onMouseEnter={(e) => {
+                                        if (!loading) {
+                                            e.target.style.backgroundColor = UBB_COLORS.primaryDark;
+                                            e.target.style.transform = 'translateY(-1px)';
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (!loading) {
+                                            e.target.style.backgroundColor = UBB_COLORS.primary;
+                                            e.target.style.transform = 'translateY(0)';
+                                        }
+                                    }}
                                 >
                                     {loading ? 'Ingresando...' : 'Ingresar'}
                                 </button>
                             </form>
                         ) : (
-                            <form onSubmit={handleRegister} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Nombre
-                                        </label>
+                            /* Register Form */
+                            <form onSubmit={handleRegister}>
+                                <div style={{...styles.gridCols2, marginBottom: '0'}}>
+                                    <div style={styles.formGroup}>
+                                        <label style={styles.label}>Nombre</label>
                                         <input
                                             type="text"
                                             value={registerData.firstName}
@@ -342,15 +495,15 @@ const AuthPage = ({ onLogin }) => {
                                                     firstName: e.target.value
                                                 })
                                             }
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            style={{...styles.input, paddingLeft: '20px'}}
+                                            onFocus={handleInputFocus}
+                                            onBlur={handleInputBlur}
+                                            placeholder="Juan"
                                             required
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Apellido
-                                        </label>
+                                    <div style={styles.formGroup}>
+                                        <label style={styles.label}>Apellido</label>
                                         <input
                                             type="text"
                                             value={registerData.lastName}
@@ -360,19 +513,21 @@ const AuthPage = ({ onLogin }) => {
                                                     lastName: e.target.value
                                                 })
                                             }
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            style={{...styles.input, paddingLeft: '20px'}}
+                                            onFocus={handleInputFocus}
+                                            onBlur={handleInputBlur}
+                                            placeholder="Pérez"
                                             required
                                         />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <div style={styles.formGroup}>
+                                    <label style={styles.label}>
                                         Nombre de usuario
                                     </label>
-                                    <div className="relative">
-                                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <div style={styles.inputContainer}>
+                                        <User style={styles.inputIcon} size={20} />
                                         <input
                                             type="text"
                                             value={registerData.username}
@@ -382,21 +537,22 @@ const AuthPage = ({ onLogin }) => {
                                                     username: e.target.value
                                                 })
                                             }
-                                            className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            style={styles.input}
+                                            onFocus={handleInputFocus}
+                                            onBlur={handleInputBlur}
                                             placeholder="usuario123"
                                             required
                                         />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <div style={styles.formGroup}>
+                                    <label style={styles.label}>
                                         Correo Institucional
                                     </label>
-                                    <div className="flex">
-                                        <div className="relative flex-grow">
-                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <div style={styles.emailGrid}>
+                                        <div style={{...styles.inputContainer, flex: 1}}>
+                                            <Mail style={styles.inputIcon} size={20} />
                                             <input
                                                 type="text"
                                                 value={registerData.emailPrefix}
@@ -406,8 +562,9 @@ const AuthPage = ({ onLogin }) => {
                                                         emailPrefix: e.target.value
                                                     })
                                                 }
-                                                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                                style={styles.input}
+                                                onFocus={handleInputFocus}
+                                                onBlur={handleInputBlur}
                                                 placeholder="tu.correo"
                                                 required
                                             />
@@ -421,8 +578,7 @@ const AuthPage = ({ onLogin }) => {
                                                     isExternal: false
                                                 })
                                             }
-                                            className="ml-2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            style={styles.select}
                                         >
                                             <option value="alumnos.ubiobio.cl">
                                                 @alumnos.ubiobio.cl
@@ -433,16 +589,16 @@ const AuthPage = ({ onLogin }) => {
                                 </div>
 
                                 {registerData.emailDomain === 'ubiobio.cl' && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            ¿Eres externo?
+                                    <div style={styles.formGroup}>
+                                        <label style={styles.label}>
+                                            ¿Eres externo a la universidad?
                                         </label>
-                                        <div className="flex items-center space-x-4">
-                                            <label className="flex items-center">
+                                        <div style={styles.radioGroup}>
+                                            <label style={styles.radioLabel}>
                                                 <input
                                                     type="radio"
                                                     name="isExternal"
-                                                    className="mr-2"
+                                                    style={styles.radio}
                                                     checked={registerData.isExternal}
                                                     onChange={() =>
                                                         setRegisterData({
@@ -451,13 +607,13 @@ const AuthPage = ({ onLogin }) => {
                                                         })
                                                     }
                                                 />
-                                                Sí
+                                                Sí, soy externo
                                             </label>
-                                            <label className="flex items-center">
+                                            <label style={styles.radioLabel}>
                                                 <input
                                                     type="radio"
                                                     name="isExternal"
-                                                    className="mr-2"
+                                                    style={styles.radio}
                                                     checked={!registerData.isExternal}
                                                     onChange={() =>
                                                         setRegisterData({
@@ -466,18 +622,18 @@ const AuthPage = ({ onLogin }) => {
                                                         })
                                                     }
                                                 />
-                                                No
+                                                No, pertenezco a UBB
                                             </label>
                                         </div>
                                     </div>
                                 )}
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <div style={styles.formGroup}>
+                                    <label style={styles.label}>
                                         Contraseña
                                     </label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <div style={styles.inputContainer}>
+                                        <Lock style={styles.inputIcon} size={20} />
                                         <input
                                             type={showPassword ? 'text' : 'password'}
                                             value={registerData.password}
@@ -487,31 +643,29 @@ const AuthPage = ({ onLogin }) => {
                                                     password: e.target.value
                                                 })
                                             }
-                                            className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            style={{...styles.input, paddingRight: '56px'}}
+                                            onFocus={handleInputFocus}
+                                            onBlur={handleInputBlur}
                                             placeholder="••••••••"
                                             required
                                         />
-                                        <button
-                                            type="button"
+                                        <div
+                                            style={styles.eyeIcon}
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            onMouseEnter={(e) => e.target.style.color = '#6b7280'}
+                                            onMouseLeave={(e) => e.target.style.color = '#9ca3af'}
                                         >
-                                            {showPassword ? (
-                                                <EyeOff className="w-5 h-5" />
-                                            ) : (
-                                                <Eye className="w-5 h-5" />
-                                            )}
-                                        </button>
+                                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <div style={styles.formGroup}>
+                                    <label style={styles.label}>
                                         Confirmar Contraseña
                                     </label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <div style={styles.inputContainer}>
+                                        <Lock style={styles.inputIcon} size={20} />
                                         <input
                                             type="password"
                                             value={registerData.confirmPassword}
@@ -521,8 +675,9 @@ const AuthPage = ({ onLogin }) => {
                                                     confirmPassword: e.target.value
                                                 })
                                             }
-                                            className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            style={styles.input}
+                                            onFocus={handleInputFocus}
+                                            onBlur={handleInputBlur}
                                             placeholder="••••••••"
                                             required
                                         />
@@ -532,20 +687,22 @@ const AuthPage = ({ onLogin }) => {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     style={{
-                                        backgroundColor: loading
-                                            ? UBB_COLORS.gray
-                                            : UBB_COLORS.primary
+                                        ...styles.button,
+                                        ...(loading ? styles.disabledButton : styles.primaryButton)
                                     }}
-                                    onMouseEnter={(e) =>
-                                        !loading &&
-                                        (e.currentTarget.style.backgroundColor = UBB_COLORS.primaryDark)
-                                    }
-                                    onMouseLeave={(e) =>
-                                        !loading &&
-                                        (e.currentTarget.style.backgroundColor = UBB_COLORS.primary)
-                                    }
+                                    onMouseEnter={(e) => {
+                                        if (!loading) {
+                                            e.target.style.backgroundColor = UBB_COLORS.primaryDark;
+                                            e.target.style.transform = 'translateY(-1px)';
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (!loading) {
+                                            e.target.style.backgroundColor = UBB_COLORS.primary;
+                                            e.target.style.transform = 'translateY(0)';
+                                        }
+                                    }}
                                 >
                                     {loading ? 'Registrando...' : 'Registrarse'}
                                 </button>
@@ -554,14 +711,8 @@ const AuthPage = ({ onLogin }) => {
                     </div>
                 </div>
 
-                <p
-                    style={{
-                        fontSize: '12px',
-                        color: '#6b7280',
-                        textAlign: 'center',
-                        marginTop: '16px'
-                    }}
-                >
+                {/* Footer */}
+                <p style={styles.footer}>
                     Universidad del Bío-Bío © 2025
                 </p>
             </div>
