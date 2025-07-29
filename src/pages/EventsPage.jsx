@@ -14,7 +14,8 @@ import {
     DialogContent,
     DialogActions,
     Checkbox,
-    FormControlLabel
+    FormControlLabel,
+    Pagination
 } from '@mui/material';
 import eventService from '../services/eventService';
 import { UBB_COLORS } from '../styles/colors';
@@ -97,6 +98,8 @@ const EventsPage = () => {
         visibilidad: true
     });
     const [editingId, setEditingId] = useState(null);
+    const [page, setPage] = useState(1);
+    const EVENTS_PER_PAGE = 20;
 
     useEffect(() => {
         const load = async () => {
@@ -109,7 +112,8 @@ const EventsPage = () => {
                 setUserId(uid);
 
                 const all = await eventService.getUpcomingEvents();
-                setEvents(all);
+                setEvents(all.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio)));
+                setPage(1);
 
                 if (uid) {
                     const mine = await eventService.getEventsByCreator(uid);
@@ -130,7 +134,8 @@ const EventsPage = () => {
 
     const refreshAll = async () => {
         const all = await eventService.getUpcomingEvents();
-        setEvents(all);
+        setEvents(all.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio)));
+        setPage(1);
         if (userId) {
             const mine = await eventService.getEventsByCreator(userId);
             setMyEvents(mine);
@@ -233,7 +238,9 @@ const EventsPage = () => {
             </Tabs>
             <Box>
                 {tab === 0 &&
-                    events.map((ev) => (
+                    events
+                        .slice((page - 1) * EVENTS_PER_PAGE, page * EVENTS_PER_PAGE)
+                        .map((ev) => (
                         <EventCard
                             key={ev.id}
                             event={ev}
@@ -250,6 +257,16 @@ const EventsPage = () => {
                         <EventCard key={ev.id} event={ev} pending onApprove={handleApprove} onDelete={handleDelete} />
                     ))}
             </Box>
+            {tab === 0 && events.length > EVENTS_PER_PAGE && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <Pagination
+                        count={Math.ceil(events.length / EVENTS_PER_PAGE)}
+                        page={page}
+                        onChange={(e, value) => setPage(value)}
+                        color="primary"
+                    />
+                </Box>
+            )}
             <Dialog open={formOpen} onClose={() => { setFormOpen(false); setEditingId(null); }} fullWidth maxWidth="sm">
                 <DialogTitle>{editingId ? 'Editar Evento' : 'Crear Evento'}</DialogTitle>
                 <DialogContent>
