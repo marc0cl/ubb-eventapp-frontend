@@ -13,7 +13,11 @@ const eventService = {
     },
 
     getUpcomingEvents: async () => {
-        const now = new Date().toISOString().replace('Z', '');
+        // Backend expects the 'after' parameter without timezone information or
+        // milliseconds. `toISOString()` returns a string with milliseconds,
+        // which some backends fail to parse correctly. We therefore strip the
+        // milliseconds portion.
+        const now = new Date().toISOString().split('.')[0];
         const response = await axiosInstance.get(`/events/upcoming`, {
             params: { after: now }
         });
