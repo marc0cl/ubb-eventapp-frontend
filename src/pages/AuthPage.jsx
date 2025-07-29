@@ -19,7 +19,7 @@ import authService from '../services/authService';
 import { validateUBBEmail } from '../utils/validators';
 import { UBB_COLORS } from '../styles/colors';
 
-const AuthPage = () => {
+const AuthPage = ({ onLogin }) => {
     const navigate = useNavigate();
     const [tab, setTab] = useState(0); // 0 login, 1 register
     const [showPassword, setShowPassword] = useState(false);
@@ -62,6 +62,7 @@ const AuthPage = () => {
             const data = await authService.login(loginData.email, loginData.password);
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
+            if (onLogin) onLogin();
             setSuccess('¡Inicio de sesión exitoso! Redirigiendo...');
             setTimeout(() => {
                 navigate('/dashboard');
@@ -111,6 +112,7 @@ const AuthPage = () => {
             const data = await authService.register(dataToSend);
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
+            if (onLogin) onLogin();
             setSuccess('¡Registro exitoso! Redirigiendo...');
             setTimeout(() => {
                 navigate('/dashboard');

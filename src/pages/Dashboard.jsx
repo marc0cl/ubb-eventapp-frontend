@@ -11,12 +11,13 @@ import { Calendar, List, User, LogOut } from 'lucide-react';
 import authService from '../services/authService';
 import { UBB_COLORS } from '../styles/colors';
 
-const Dashboard = () => {
+const Dashboard = ({ onLogout }) => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         try {
             await authService.logout();
+            if (onLogout) onLogout();
             navigate('/');
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
