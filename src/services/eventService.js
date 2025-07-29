@@ -70,16 +70,17 @@ const eventService = {
 
     registerForEvent: async (eventId, userId) => {
         const response = await axiosInstance.post(`/registrations`, {
-            id_evento: eventId,
-            id_usuario: userId
+            id: { eventId, userId },
+            event: { id: eventId },
+            user: { id: userId }
         });
         return response.data;
     },
 
     cancelRegistration: async (eventId, userId) => {
         const response = await axiosInstance.post(`/registrations/cancel`, {
-            id_evento: eventId,
-            id_usuario: userId
+            eventId,
+            userId
         });
         return response.data;
     },
