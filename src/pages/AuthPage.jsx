@@ -1,18 +1,4 @@
 import React, { useState } from 'react';
-import {
-    Container,
-    Box,
-    Tabs,
-    Tab,
-    TextField,
-    Button,
-    Typography,
-    Paper,
-    Alert,
-    IconButton,
-    InputAdornment,
-    Grid
-} from '@mui/material';
 import { Calendar, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
@@ -148,304 +134,438 @@ const AuthPage = ({ onLogin }) => {
     };
 
     return (
-        <Box sx={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(to bottom right, #f8f8f8, #eaeaea)',
-            p: 2
-        }}>
-            <Container maxWidth="xs">
-                <Box textAlign="center" mb={3}>
-                    <Box
-                        sx={{
+        <div
+            style={{
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f9fafb',
+                padding: '16px'
+            }}
+        >
+            <div style={{ width: '100%', maxWidth: '400px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <div
+                        style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: 56,
-                            height: 56,
-                            borderRadius: 2,
-                            mb: 1,
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '12px',
+                            marginBottom: '8px',
                             backgroundColor: UBB_COLORS.primary
                         }}
                     >
                         <Calendar color="white" size={32} />
-                    </Box>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
-                        Portal de Eventos UBB
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Tu calendario universitario en un solo lugar
-                    </Typography>
-                </Box>
-
-                <Paper elevation={3} sx={{ overflow: 'hidden' }}>
-                    <Tabs
-                        value={tab}
-                        onChange={handleTabChange}
-                        variant="fullWidth"
-                        textColor="inherit"
-                        sx={{ '& .MuiTabs-indicator': { backgroundColor: UBB_COLORS.primary } }}
+                    </div>
+                    <h1
+                        style={{
+                            fontSize: '24px',
+                            fontWeight: 'bold',
+                            color: '#1f2937',
+                            marginBottom: '4px'
+                        }}
                     >
-                        <Tab
-                            label="Iniciar Sesión"
-                            sx={tab === 0 ? { color: 'white', backgroundColor: UBB_COLORS.primary } : { color: '#555' }}
-                        />
-                        <Tab
-                            label="Registrarse"
-                            sx={tab === 1 ? { color: 'white', backgroundColor: UBB_COLORS.primary } : { color: '#555' }}
-                        />
-                    </Tabs>
+                        Portal de Eventos UBB
+                    </h1>
+                    <p style={{ color: '#6b7280', fontSize: '14px' }}>
+                        Tu calendario universitario en un solo lugar
+                    </p>
+                </div>
 
-                    <Box sx={{ p: 3 }}>
+                <div
+                    style={{
+                        backgroundColor: 'white',
+                        borderRadius: '12px',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                        border: '1px solid #e5e7eb'
+                    }}
+                >
+                    <div style={{ display: 'flex' }}>
+                        <button
+                            onClick={() => handleTabChange(null, 0)}
+                            style={{
+                                flex: 1,
+                                padding: '12px 0',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                border: 'none',
+                                cursor: 'pointer',
+                                backgroundColor: tab === 0 ? UBB_COLORS.primary : 'transparent',
+                                color: tab === 0 ? 'white' : '#6b7280',
+                                borderTopLeftRadius: '12px',
+                                borderTopRightRadius: '12px',
+                                transition: 'background-color 0.2s'
+                            }}
+                        >
+                            Iniciar Sesión
+                        </button>
+                        <button
+                            onClick={() => handleTabChange(null, 1)}
+                            style={{
+                                flex: 1,
+                                padding: '12px 0',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                border: 'none',
+                                cursor: 'pointer',
+                                backgroundColor: tab === 1 ? UBB_COLORS.primary : 'transparent',
+                                color: tab === 1 ? 'white' : '#6b7280',
+                                borderTopLeftRadius: '12px',
+                                borderTopRightRadius: '12px',
+                                transition: 'background-color 0.2s'
+                            }}
+                        >
+                            Registrarse
+                        </button>
+                    </div>
+
+                    <div style={{ padding: '24px' }}>
                         {error && (
-                            <Alert severity="error" sx={{ mb: 2 }}>
+                            <div
+                                style={{
+                                    marginBottom: '16px',
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    backgroundColor: '#fee2e2',
+                                    border: '1px solid #fecaca',
+                                    color: '#b91c1c',
+                                    fontSize: '14px'
+                                }}
+                            >
                                 {error}
-                            </Alert>
+                            </div>
                         )}
                         {success && (
-                            <Alert severity="success" sx={{ mb: 2 }}>
+                            <div
+                                style={{
+                                    marginBottom: '16px',
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    backgroundColor: '#d1fae5',
+                                    border: '1px solid #a7f3d0',
+                                    color: '#047857',
+                                    fontSize: '14px'
+                                }}
+                            >
                                 {success}
-                            </Alert>
+                            </div>
                         )}
 
                         {tab === 0 ? (
-                            <form onSubmit={handleLogin}>
-                                <TextField
-                                    label="Correo Institucional"
-                                    type="email"
-                                    value={loginData.email}
-                                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                                    fullWidth
-                                    required
-                                    margin="normal"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Mail size={18} />
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                />
-                                <TextField
-                                    label="Contraseña"
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={loginData.password}
-                                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                                    fullWidth
-                                    required
-                                    margin="normal"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Lock size={18} />
-                                            </InputAdornment>
-                                        ),
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                />
-                                <Button
+                            <form onSubmit={handleLogin} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Correo Institucional
+                                    </label>
+                                    <div className="relative">
+                                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="email"
+                                            value={loginData.email}
+                                            onChange={(e) =>
+                                                setLoginData({ ...loginData, email: e.target.value })
+                                            }
+                                            className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Contraseña
+                                    </label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            value={loginData.password}
+                                            onChange={(e) =>
+                                                setLoginData({ ...loginData, password: e.target.value })
+                                            }
+                                            className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="w-5 h-5" />
+                                            ) : (
+                                                <Eye className="w-5 h-5" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button
                                     type="submit"
-                                    fullWidth
                                     disabled={loading}
-                                    sx={{
-                                        mt: 2,
-                                        color: '#fff',
-                                        backgroundColor: loading ? UBB_COLORS.gray : UBB_COLORS.primary,
-                                        '&:hover': { backgroundColor: UBB_COLORS.primaryDark }
+                                    className="w-full text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    style={{
+                                        backgroundColor: loading
+                                            ? UBB_COLORS.gray
+                                            : UBB_COLORS.primary
                                     }}
+                                    onMouseEnter={(e) =>
+                                        !loading &&
+                                        (e.currentTarget.style.backgroundColor = UBB_COLORS.primaryDark)
+                                    }
+                                    onMouseLeave={(e) =>
+                                        !loading &&
+                                        (e.currentTarget.style.backgroundColor = UBB_COLORS.primary)
+                                    }
                                 >
                                     {loading ? 'Ingresando...' : 'Ingresar'}
-                                </Button>
+                                </button>
                             </form>
                         ) : (
-                            // Formulario de Registro
-                            <form onSubmit={handleRegister}>
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Nombre
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={registerData.firstName}
-                                                onChange={(e) => setRegisterData({...registerData, firstName: e.target.value})}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Apellido
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={registerData.lastName}
-                                                onChange={(e) => setRegisterData({...registerData, lastName: e.target.value})}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
+                            <form onSubmit={handleRegister} className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Nombre de usuario
+                                            Nombre
                                         </label>
-                                        <div className="relative">
-                                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type="text"
-                                                value={registerData.username}
-                                                onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
-                                                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="usuario123"
-                                                required
-                                            />
-                                        </div>
+                                        <input
+                                            type="text"
+                                            value={registerData.firstName}
+                                            onChange={(e) =>
+                                                setRegisterData({
+                                                    ...registerData,
+                                                    firstName: e.target.value
+                                                })
+                                            }
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            required
+                                        />
                                     </div>
-
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Correo Institucional
+                                            Apellido
                                         </label>
-                                        <div className="flex">
-                                            <div className="relative flex-grow">
-                                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                                <input
-                                                    type="text"
-                                                    value={registerData.emailPrefix}
-                                                    onChange={(e) => setRegisterData({...registerData, emailPrefix: e.target.value})}
-                                                    className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                    style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                    placeholder="tu.correo"
-                                                    required
-                                                />
-                                            </div>
-                                            <select
-                                                value={registerData.emailDomain}
-                                                onChange={(e) => setRegisterData({...registerData, emailDomain: e.target.value, isExternal: false})}
-                                                className="ml-2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                            >
-                                                <option value="alumnos.ubiobio.cl">@alumnos.ubiobio.cl</option>
-                                                <option value="ubiobio.cl">@ubiobio.cl</option>
-                                            </select>
-                                        </div>
+                                        <input
+                                            type="text"
+                                            value={registerData.lastName}
+                                            onChange={(e) =>
+                                                setRegisterData({
+                                                    ...registerData,
+                                                    lastName: e.target.value
+                                                })
+                                            }
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            required
+                                        />
                                     </div>
-
-                                    {registerData.emailDomain === 'ubiobio.cl' && (
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                ¿Eres externo?
-                                            </label>
-                                            <div className="flex items-center space-x-4">
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="radio"
-                                                        name="isExternal"
-                                                        className="mr-2"
-                                                        checked={registerData.isExternal}
-                                                        onChange={() => setRegisterData({...registerData, isExternal: true})}
-                                                    />
-                                                    Sí
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="radio"
-                                                        name="isExternal"
-                                                        className="mr-2"
-                                                        checked={!registerData.isExternal}
-                                                        onChange={() => setRegisterData({...registerData, isExternal: false})}
-                                                    />
-                                                    No
-                                                </label>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Contraseña
-                                        </label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type={showPassword ? "text" : "password"}
-                                                value={registerData.password}
-                                                onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
-                                                className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="••••••••"
-                                                required
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                            >
-                                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Confirmar Contraseña
-                                        </label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type="password"
-                                                value={registerData.confirmPassword}
-                                                onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
-                                                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="••••••••"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="w-full text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                        style={{
-                                            backgroundColor: loading ? UBB_COLORS.gray : UBB_COLORS.primary
-                                        }}
-                                        onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = UBB_COLORS.primaryDark)}
-                                        onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = UBB_COLORS.primary)}
-                                    >
-                                        {loading ? 'Registrando...' : 'Registrarse'}
-                                    </button>
                                 </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Nombre de usuario
+                                    </label>
+                                    <div className="relative">
+                                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            value={registerData.username}
+                                            onChange={(e) =>
+                                                setRegisterData({
+                                                    ...registerData,
+                                                    username: e.target.value
+                                                })
+                                            }
+                                            className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            placeholder="usuario123"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Correo Institucional
+                                    </label>
+                                    <div className="flex">
+                                        <div className="relative flex-grow">
+                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <input
+                                                type="text"
+                                                value={registerData.emailPrefix}
+                                                onChange={(e) =>
+                                                    setRegisterData({
+                                                        ...registerData,
+                                                        emailPrefix: e.target.value
+                                                    })
+                                                }
+                                                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                                style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                                placeholder="tu.correo"
+                                                required
+                                            />
+                                        </div>
+                                        <select
+                                            value={registerData.emailDomain}
+                                            onChange={(e) =>
+                                                setRegisterData({
+                                                    ...registerData,
+                                                    emailDomain: e.target.value,
+                                                    isExternal: false
+                                                })
+                                            }
+                                            className="ml-2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                        >
+                                            <option value="alumnos.ubiobio.cl">
+                                                @alumnos.ubiobio.cl
+                                            </option>
+                                            <option value="ubiobio.cl">@ubiobio.cl</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {registerData.emailDomain === 'ubiobio.cl' && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            ¿Eres externo?
+                                        </label>
+                                        <div className="flex items-center space-x-4">
+                                            <label className="flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    name="isExternal"
+                                                    className="mr-2"
+                                                    checked={registerData.isExternal}
+                                                    onChange={() =>
+                                                        setRegisterData({
+                                                            ...registerData,
+                                                            isExternal: true
+                                                        })
+                                                    }
+                                                />
+                                                Sí
+                                            </label>
+                                            <label className="flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    name="isExternal"
+                                                    className="mr-2"
+                                                    checked={!registerData.isExternal}
+                                                    onChange={() =>
+                                                        setRegisterData({
+                                                            ...registerData,
+                                                            isExternal: false
+                                                        })
+                                                    }
+                                                />
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Contraseña
+                                    </label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            value={registerData.password}
+                                            onChange={(e) =>
+                                                setRegisterData({
+                                                    ...registerData,
+                                                    password: e.target.value
+                                                })
+                                            }
+                                            className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            placeholder="••••••••"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="w-5 h-5" />
+                                            ) : (
+                                                <Eye className="w-5 h-5" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Confirmar Contraseña
+                                    </label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="password"
+                                            value={registerData.confirmPassword}
+                                            onChange={(e) =>
+                                                setRegisterData({
+                                                    ...registerData,
+                                                    confirmPassword: e.target.value
+                                                })
+                                            }
+                                            className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                            style={{ '--tw-ring-color': UBB_COLORS.primary }}
+                                            placeholder="••••••••"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    style={{
+                                        backgroundColor: loading
+                                            ? UBB_COLORS.gray
+                                            : UBB_COLORS.primary
+                                    }}
+                                    onMouseEnter={(e) =>
+                                        !loading &&
+                                        (e.currentTarget.style.backgroundColor = UBB_COLORS.primaryDark)
+                                    }
+                                    onMouseLeave={(e) =>
+                                        !loading &&
+                                        (e.currentTarget.style.backgroundColor = UBB_COLORS.primary)
+                                    }
+                                >
+                                    {loading ? 'Registrando...' : 'Registrarse'}
+                                </button>
                             </form>
                         )}
-                    </Box>
-                </Paper>
+                    </div>
+                </div>
 
-                <Typography
-                    variant="caption"
-                    display="block"
-                    textAlign="center"
-                    sx={{ mt: 2, color: 'text.secondary' }}
+                <p
+                    style={{
+                        fontSize: '12px',
+                        color: '#6b7280',
+                        textAlign: 'center',
+                        marginTop: '16px'
+                    }}
                 >
                     Universidad del Bío-Bío © 2025
-                </Typography>
-            </Container>
-        </Box>
+                </p>
+            </div>
+        </div>
     );
 };
 
