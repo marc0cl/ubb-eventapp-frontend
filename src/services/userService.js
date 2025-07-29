@@ -21,6 +21,10 @@ const userService = {
         const res = await axiosInstance.get(`/friendships/pending/${userId}`);
         return res.data;
     },
+    getFriends: async (userId) => {
+        const res = await axiosInstance.get(`/friendships/friends/${userId}`);
+        return res.data;
+    },
     sendFriendRequest: async (user1, user2) => {
         const res = await axiosInstance.post(`/friendships`, { friendship: {  user1, user2 } });
         return res.data;
@@ -37,6 +41,10 @@ const userService = {
             userId,
             friendId
         });
+        return res.data;
+    },
+    deleteFriendship: async (userId, friendId) => {
+        const res = await axiosInstance.delete(`/friendships/${userId}/${friendId}`);
         return res.data;
     }
 };

@@ -22,6 +22,7 @@ const FriendsPage = () => {
   const [search, setSearch] = useState('');
   const [recommendations, setRecommendations] = useState([]);
   const [pending, setPending] = useState([]);
+  const [friends, setFriends] = useState([]);
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState({});
@@ -312,12 +313,14 @@ const FriendsPage = () => {
         if (!uid) return;
         setUserId(uid);
 
-        const [rec, pend] = await Promise.all([
+        const [rec, pend, fr] = await Promise.all([
           userService.getRecommendations(uid),
-          userService.getPendingFriendRequests(uid)
+          userService.getPendingFriendRequests(uid),
+          userService.getFriends(uid)
         ]);
         setRecommendations(rec || []);
         setPending(pend || []);
+        setFriends(fr || []);
       } catch (err) {
         console.error('Error loading friends data:', err);
       } finally {
@@ -371,6 +374,20 @@ const FriendsPage = () => {
     }
   };
 
+  const handleDeleteFriend = async (friendId) => {
+    if (!userId || actionLoading[friendId]) return;
+
+    setActionLoading(prev => ({ ...prev, [friendId]: true }));
+    try {
+      await userService.deleteFriendship(userId, friendId);
+      setFriends((prev) => prev.filter((u) => u.id !== friendId));
+    } catch (err) {
+      console.error('Error deleting friendship:', err);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [friendId]: false }));
+    }
+  };
+
   const filteredRecommendations = useMemo(
       () =>
           recommendations.filter(
@@ -383,7 +400,7 @@ const FriendsPage = () => {
       [recommendations, search]
   );
 
-  const UserCard = ({ user, type, onSendRequest, onAccept, onReject }) => {
+  const UserCard = ({ user, type, onSendRequest, onAccept, onReject, onDelete }) => {
     const [isHovered, setIsHovered] = useState(false);
     const name = user.nombres ? `${user.nombres} ${user.apellidos}` : user.name;
     const isLoading = actionLoading[user.id];
@@ -494,6 +511,25 @@ const FriendsPage = () => {
                   </button>
                 </>
             )}
+            {type === 'friend' && (
+                <button
+                    onClick={() => onDelete(user.id)}
+                    disabled={isLoading}
+                    style={{
+                      ...styles.dangerButton,
+                      ...(isLoading ? styles.disabledButton : {})
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isLoading) e.target.style.opacity = '0.9';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isLoading) e.target.style.opacity = '1';
+                    }}
+                >
+                  <UserX size={14} />
+                  {isLoading ? 'Eliminando...' : 'Eliminar'}
+                </button>
+            )}
           </div>
         </div>
     );
@@ -559,6 +595,16 @@ const FriendsPage = () => {
             >
               <Heart size={16} />
               Solicitudes pendientes ({pending.length})
+            </button>
+            <button
+                onClick={() => setTab(2)}
+                style={{
+                  ...styles.tab,
+                  ...(tab === 2 ? styles.activeTab : styles.inactiveTab)
+                }}
+            >
+              <User size={16} />
+              Amigos ({friends.length})
             </button>
           </div>
 
@@ -634,6 +680,31 @@ const FriendsPage = () => {
                       <h3 style={styles.emptyTitle}>No hay solicitudes pendientes</h3>
                       <p style={styles.emptyText}>
                         Cuando otros estudiantes te envíen solicitudes de amistad, aparecerán aquí para que puedas aceptarlas o rechazarlas.
+                      </p>
+                    </div>
+                )}
+              </>
+          )}
+
+          {tab === 2 && (
+              <>
+                {friends.length > 0 ? (
+                    <div>
+                      {friends.map((user) => (
+                          <UserCard
+                              key={user.id}
+                              user={user}
+                              type="friend"
+                              onDelete={handleDeleteFriend}
+                          />
+                      ))}
+                    </div>
+                ) : (
+                    <div style={styles.emptyState}>
+                      <Users style={styles.emptyIcon} size={64} />
+                      <h3 style={styles.emptyTitle}>Aún no tienes amigos</h3>
+                      <p style={styles.emptyText}>
+                        Cuando agregues amigos a tu comunidad aparecerán en esta sección.
                       </p>
                     </div>
                 )}
