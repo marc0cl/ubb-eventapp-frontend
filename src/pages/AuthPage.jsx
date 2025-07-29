@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
-import { Calendar, AlertCircle, User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import {
+    Container,
+    Box,
+    Tabs,
+    Tab,
+    TextField,
+    Button,
+    Typography,
+    Paper,
+    Alert,
+    IconButton,
+    InputAdornment,
+    Grid
+} from '@mui/material';
+import { Calendar, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 import { validateUBBEmail } from '../utils/validators';
@@ -7,16 +21,13 @@ import { UBB_COLORS } from '../styles/colors';
 
 const AuthPage = () => {
     const navigate = useNavigate();
-    const [isLogin, setIsLogin] = useState(true);
+    const [tab, setTab] = useState(0); // 0 login, 1 register
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const [loginData, setLoginData] = useState({
-        email: '',
-        password: ''
-    });
+    const [loginData, setLoginData] = useState({ email: '', password: '' });
 
     const [registerData, setRegisterData] = useState({
         email: '',
@@ -26,6 +37,12 @@ const AuthPage = () => {
         firstName: '',
         lastName: ''
     });
+
+    const handleTabChange = (_e, value) => {
+        setTab(value);
+        setError('');
+        setSuccess('');
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -100,275 +117,256 @@ const AuthPage = () => {
         }
     };
 
-    const handleSubmit = (e) => {
-        if (isLogin) {
-            handleLogin(e);
-        } else {
-            handleRegister(e);
-        }
-    };
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
-                {/* Logo y Título */}
-                <div className="text-center mb-8">
-                    <div className="flex justify-center items-center mb-4">
-                        <div className="rounded-lg p-3" style={{backgroundColor: UBB_COLORS.primary}}>
-                            <Calendar className="w-10 h-10 text-white" />
-                        </div>
-                    </div>
-                    <h1 className="text-3xl font-bold text-gray-800">Portal de Eventos UBB</h1>
-                    <p className="text-gray-600 mt-2">Tu calendario universitario en un solo lugar</p>
-                </div>
+        <Box sx={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(to bottom right, #f8f8f8, #eaeaea)',
+            p: 2
+        }}>
+            <Container maxWidth="xs">
+                <Box textAlign="center" mb={3}>
+                    <Box
+                        sx={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: 56,
+                            height: 56,
+                            borderRadius: 2,
+                            mb: 1,
+                            backgroundColor: UBB_COLORS.primary
+                        }}
+                    >
+                        <Calendar color="white" size={32} />
+                    </Box>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                        Portal de Eventos UBB
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Tu calendario universitario en un solo lugar
+                    </Typography>
+                </Box>
 
-                {/* Card principal */}
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                    {/* Selector de modo */}
-                    <div className="flex">
-                        <button
-                            onClick={() => setIsLogin(true)}
-                            className={`flex-1 py-4 text-center font-medium transition-all ${
-                                isLogin
-                                    ? 'text-white'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
-                            style={isLogin ? {backgroundColor: UBB_COLORS.primary} : {}}
-                        >
-                            Iniciar Sesión
-                        </button>
-                        <button
-                            onClick={() => setIsLogin(false)}
-                            className={`flex-1 py-4 text-center font-medium transition-all ${
-                                !isLogin
-                                    ? 'text-white'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
-                            style={!isLogin ? {backgroundColor: UBB_COLORS.primary} : {}}
-                        >
-                            Registrarse
-                        </button>
-                    </div>
+                <Paper elevation={3} sx={{ overflow: 'hidden' }}>
+                    <Tabs
+                        value={tab}
+                        onChange={handleTabChange}
+                        variant="fullWidth"
+                        textColor="inherit"
+                        sx={{ '& .MuiTabs-indicator': { backgroundColor: UBB_COLORS.primary } }}
+                    >
+                        <Tab
+                            label="Iniciar Sesión"
+                            sx={tab === 0 ? { color: 'white', backgroundColor: UBB_COLORS.primary } : { color: '#555' }}
+                        />
+                        <Tab
+                            label="Registrarse"
+                            sx={tab === 1 ? { color: 'white', backgroundColor: UBB_COLORS.primary } : { color: '#555' }}
+                        />
+                    </Tabs>
 
-                    {/* Contenido del formulario */}
-                    <div className="p-8">
+                    <Box component="form" onSubmit={tab === 0 ? handleLogin : handleRegister} sx={{ p: 3 }}>
                         {error && (
-                            <div
-                                className="mb-4 p-3 bg-red-50 rounded-lg flex items-start gap-2"
-                                style={{
-                                    borderColor: UBB_COLORS.secondary,
-                                    borderWidth: '1px',
-                                    borderStyle: 'solid'
-                                }}
-                            >
-                                <AlertCircle className="w-5 h-5 mt-0.5" style={{color: UBB_COLORS.secondary}} />
-                                <p className="text-sm" style={{color: UBB_COLORS.secondary}}>{error}</p>
-                            </div>
+                            <Alert severity="error" sx={{ mb: 2 }}>
+                                {error}
+                            </Alert>
                         )}
-
                         {success && (
-                            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                <p className="text-sm text-green-700">{success}</p>
-                            </div>
+                            <Alert severity="success" sx={{ mb: 2 }}>
+                                {success}
+                            </Alert>
                         )}
 
-                        {isLogin ? (
-                            // Formulario de Login
-                            <form onSubmit={handleLogin}>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Correo Institucional
-                                        </label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type="email"
-                                                value={loginData.email}
-                                                onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-                                                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="tu.correo@alumnos.ubiobio.cl"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Contraseña
-                                        </label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type={showPassword ? "text" : "password"}
-                                                value={loginData.password}
-                                                onChange={(e) => setLoginData({...loginData, password: e.target.value})}
-                                                className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="••••••••"
-                                                required
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                            >
-                                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="w-full text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                        style={{
-                                            backgroundColor: loading ? UBB_COLORS.gray : UBB_COLORS.primary
-                                        }}
-                                        onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = UBB_COLORS.primaryDark)}
-                                        onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = UBB_COLORS.primary)}
-                                    >
-                                        {loading ? 'Ingresando...' : 'Ingresar'}
-                                    </button>
-                                </div>
-                            </form>
+                        {tab === 0 ? (
+                            <>
+                                <TextField
+                                    label="Correo Institucional"
+                                    type="email"
+                                    value={loginData.email}
+                                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                                    fullWidth
+                                    required
+                                    margin="normal"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Mail size={18} />
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                                <TextField
+                                    label="Contraseña"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={loginData.password}
+                                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                                    fullWidth
+                                    required
+                                    margin="normal"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Lock size={18} />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    disabled={loading}
+                                    sx={{
+                                        mt: 2,
+                                        color: '#fff',
+                                        backgroundColor: loading ? UBB_COLORS.gray : UBB_COLORS.primary,
+                                        '&:hover': { backgroundColor: UBB_COLORS.primaryDark }
+                                    }}
+                                >
+                                    {loading ? 'Ingresando...' : 'Ingresar'}
+                                </Button>
+                            </>
                         ) : (
-                            // Formulario de Registro
-                            <form onSubmit={handleRegister}>
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Nombre
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={registerData.firstName}
-                                                onChange={(e) => setRegisterData({...registerData, firstName: e.target.value})}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Apellido
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={registerData.lastName}
-                                                onChange={(e) => setRegisterData({...registerData, lastName: e.target.value})}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Nombre de usuario
-                                        </label>
-                                        <div className="relative">
-                                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type="text"
-                                                value={registerData.username}
-                                                onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
-                                                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="usuario123"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Correo Institucional
-                                        </label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type="email"
-                                                value={registerData.email}
-                                                onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
-                                                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="tu.correo@alumnos.ubiobio.cl"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Contraseña
-                                        </label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type={showPassword ? "text" : "password"}
-                                                value={registerData.password}
-                                                onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
-                                                className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="••••••••"
-                                                required
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                            >
-                                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Confirmar Contraseña
-                                        </label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                            <input
-                                                type="password"
-                                                value={registerData.confirmPassword}
-                                                onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
-                                                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
-                                                style={{'--tw-ring-color': UBB_COLORS.primary}}
-                                                placeholder="••••••••"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="w-full text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                        style={{
-                                            backgroundColor: loading ? UBB_COLORS.gray : UBB_COLORS.primary
-                                        }}
-                                        onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = UBB_COLORS.primaryDark)}
-                                        onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = UBB_COLORS.primary)}
-                                    >
-                                        {loading ? 'Registrando...' : 'Registrarse'}
-                                    </button>
-                                </div>
-                            </form>
+                            <>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="Nombre"
+                                            value={registerData.firstName}
+                                            onChange={(e) =>
+                                                setRegisterData({ ...registerData, firstName: e.target.value })
+                                            }
+                                            fullWidth
+                                            required
+                                            margin="normal"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="Apellido"
+                                            value={registerData.lastName}
+                                            onChange={(e) =>
+                                                setRegisterData({ ...registerData, lastName: e.target.value })
+                                            }
+                                            fullWidth
+                                            required
+                                            margin="normal"
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <TextField
+                                    label="Nombre de usuario"
+                                    value={registerData.username}
+                                    onChange={(e) =>
+                                        setRegisterData({ ...registerData, username: e.target.value })
+                                    }
+                                    fullWidth
+                                    required
+                                    margin="normal"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <User size={18} />
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                                <TextField
+                                    label="Correo Institucional"
+                                    type="email"
+                                    value={registerData.email}
+                                    onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                                    fullWidth
+                                    required
+                                    margin="normal"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Mail size={18} />
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                                <TextField
+                                    label="Contraseña"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={registerData.password}
+                                    onChange={(e) =>
+                                        setRegisterData({ ...registerData, password: e.target.value })
+                                    }
+                                    fullWidth
+                                    required
+                                    margin="normal"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Lock size={18} />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                                <TextField
+                                    label="Confirmar Contraseña"
+                                    type="password"
+                                    value={registerData.confirmPassword}
+                                    onChange={(e) =>
+                                        setRegisterData({ ...registerData, confirmPassword: e.target.value })
+                                    }
+                                    fullWidth
+                                    required
+                                    margin="normal"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Lock size={18} />
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    disabled={loading}
+                                    sx={{
+                                        mt: 2,
+                                        color: '#fff',
+                                        backgroundColor: loading ? UBB_COLORS.gray : UBB_COLORS.primary,
+                                        '&:hover': { backgroundColor: UBB_COLORS.primaryDark }
+                                    }}
+                                >
+                                    {loading ? 'Registrando...' : 'Registrarse'}
+                                </Button>
+                            </>
                         )}
-                    </div>
-                </div>
+                    </Box>
+                </Paper>
 
-                {/* Pie de página */}
-                <p className="text-center text-gray-600 text-sm mt-6">
+                <Typography
+                    variant="caption"
+                    display="block"
+                    textAlign="center"
+                    sx={{ mt: 2, color: 'text.secondary' }}
+                >
                     Universidad del Bío-Bío © 2025
-                </p>
-            </div>
-        </div>
+                </Typography>
+            </Container>
+        </Box>
     );
 };
 
