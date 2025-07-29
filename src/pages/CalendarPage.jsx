@@ -2,14 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Container, Typography, Card, CardContent } from '@mui/material';
 import eventService from '../services/eventService';
 import { UBB_COLORS } from '../styles/colors';
-
-const parseJwt = (token) => {
-    try {
-        return JSON.parse(atob(token.split('.')[1]));
-    } catch (e) {
-        return null;
-    }
-};
+import { getUserIdFromToken } from '../utils/auth';
 
 const CalendarPage = () => {
     const [events, setEvents] = useState([]);
@@ -18,8 +11,7 @@ const CalendarPage = () => {
         const fetchEvents = async () => {
             const token = localStorage.getItem('accessToken');
             if (!token) return;
-            const payload = parseJwt(token);
-            const userId = payload?.id || payload?.userId || payload?.sub;
+            const userId = getUserIdFromToken(token);
             if (!userId) return;
             try {
                 const toAttend = await eventService.getEventsToAttend(userId);
