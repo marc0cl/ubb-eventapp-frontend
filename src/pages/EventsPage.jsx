@@ -150,7 +150,11 @@ const EventsPage = () => {
 
     const handleCreateOrUpdate = async () => {
         try {
-            const data = { ...formData, aforoMax: Number(formData.aforoMax), visibilidad: formData.visibilidad };
+            const data = {
+                ...formData,
+                aforoMax: Number(formData.aforoMax),
+                visibilidad: formData.visibilidad ? 'PUBLICO' : 'PRIVADO'
+            };
             if (editingId) {
                 await eventService.updateEvent({ ...data, id: editingId });
             } else {
@@ -216,7 +220,7 @@ const EventsPage = () => {
             fechaFin: ev.fechaFin,
             lugar: ev.lugar,
             aforoMax: ev.aforoMax,
-            visibilidad: ev.visibilidad !== false
+            visibilidad: ev.visibilidad === 'PUBLICO'
         });
         setFormOpen(true);
     };
