@@ -18,11 +18,20 @@ const authService = {
 
     logout: async () => {
         const token = localStorage.getItem('accessToken');
-        await axios.post(`${API_URL}/auth/logout`, {}, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        try {
+            if (token) {
+                await axios.post(
+                    `${API_URL}/auth/logout`,
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            }
+        } catch (err) {
+            console.error('Failed to logout from API:', err);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+        }
     }
 };
 
