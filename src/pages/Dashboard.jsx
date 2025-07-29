@@ -46,8 +46,10 @@ const Dashboard = ({ onLogout }) => {
                 ]);
 
                 setUserName(userData.nombres);
+                const createdCount = summaryData.events?.eventsCreated || 0;
+                const toAttendCount = summaryData.events?.eventsToAttend || 0;
                 setStats({
-                    eventsToAttend: summaryData.events?.eventsToAttend || 0,
+                    eventsToAttend: toAttendCount + createdCount,
                     friendsCount: summaryData.friendsCount || 0,
                     eventsAttended: summaryData.events?.eventsAttended || 0
                 });
