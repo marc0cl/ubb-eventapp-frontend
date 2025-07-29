@@ -70,7 +70,8 @@ const eventService = {
 
     registerForEvent: async (eventId, userId) => {
         const response = await axiosInstance.post(`/registrations`, {
-            id: { eventId, userId }
+            eventId,
+            userId
         });
         return response.data;
     },
