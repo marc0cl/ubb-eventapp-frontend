@@ -156,17 +156,17 @@ const EventsPage = () => {
                 aforoMax: Number(formData.aforoMax),
                 visibilidad: formData.visibilidad ? 'PUBLICO' : 'PRIVADO'
             };
+            const withCreator = {
+                ...data,
+                creador: { id: userId }
+            };
             if (editingId) {
                 await eventService.updateEvent({
-                    ...data,
-                    id: editingId,
-                    creadorId: userId
+                    ...withCreator,
+                    id: editingId
                 });
             } else {
-                await eventService.createEvent({
-                    ...data,
-                    creadorId: userId
-                });
+                await eventService.createEvent(withCreator);
             }
             setFormOpen(false);
             setFormData({ titulo: '', descripcion: '', fechaInicio: '', fechaFin: '', lugar: '', aforoMax: '', visibilidad: true, origenTipo: 'USUARIO' });
