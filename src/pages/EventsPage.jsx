@@ -48,6 +48,8 @@ const EventsPage = () => {
     const [editingId, setEditingId] = useState(null);
     const [page, setPage] = useState(1);
     const EVENTS_PER_PAGE = 12;
+    const [deleteId, setDeleteId] = useState(null);
+    const [confirmEdit, setConfirmEdit] = useState(false);
 
     // Estilos basados en las especificaciones
     const styles = {
@@ -447,8 +449,7 @@ const EventsPage = () => {
         }
     };
 
-    const handleCreateOrUpdate = async (e) => {
-        e.preventDefault();
+    const performCreateOrUpdate = async () => {
         try {
             const data = {
                 ...formData,
@@ -476,14 +477,31 @@ const EventsPage = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (confirm('¿Estás seguro de que deseas eliminar este evento?')) {
-            try {
-                await eventService.deleteEvent(id);
-                await refreshAll();
-            } catch (err) {
-                console.error('Error deleting event', err);
-            }
+    const handleCreateOrUpdate = async (e) => {
+        e.preventDefault();
+        if (editingId) {
+            setConfirmEdit(true);
+            return;
+        }
+        await performCreateOrUpdate();
+    };
+
+    const confirmEditUpdate = async () => {
+        setConfirmEdit(false);
+        await performCreateOrUpdate();
+    };
+
+    const handleDelete = (id) => {
+        setDeleteId(id);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            await eventService.deleteEvent(deleteId);
+            setDeleteId(null);
+            await refreshAll();
+        } catch (err) {
+            console.error('Error deleting event', err);
         }
     };
 
@@ -699,6 +717,45 @@ const EventsPage = () => {
             </div>
         );
     };
+
+    const ConfirmationModal = ({ message, onConfirm, onCancel }) => (
+        <div style={styles.modal} onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
+            <div style={styles.modalContent}>
+                <div style={styles.modalHeader}>
+                    <h2 style={styles.modalTitle}>Confirmar</h2>
+                    <button
+                        onClick={onCancel}
+                        style={styles.closeButton}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#f3f4f6'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                    >
+                        <XCircle size={24} />
+                    </button>
+                </div>
+                <p style={{ marginBottom: '24px' }}>{message}</p>
+                <div style={styles.modalActions}>
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        style={{ ...styles.secondaryButton, padding: '12px 24px' }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = `${UBB_COLORS.primary}10`}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onConfirm}
+                        style={{ ...styles.primaryButton, padding: '12px 24px' }}
+                        onMouseEnter={(e) => { e.target.style.backgroundColor = UBB_COLORS.primaryDark; e.target.style.transform = 'translateY(-1px)'; }}
+                        onMouseLeave={(e) => { e.target.style.backgroundColor = UBB_COLORS.primary; e.target.style.transform = 'translateY(0)'; }}
+                    >
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 
     if (loading) {
         return (
@@ -1135,6 +1192,20 @@ const EventsPage = () => {
                         </form>
                     </div>
                 </div>
+            )}
+            {deleteId && (
+                <ConfirmationModal
+                    message="¿Estás seguro de que deseas eliminar este evento?"
+                    onConfirm={confirmDelete}
+                    onCancel={() => setDeleteId(null)}
+                />
+            )}
+            {confirmEdit && (
+                <ConfirmationModal
+                    message="¿Guardar cambios en el evento?"
+                    onConfirm={confirmEditUpdate}
+                    onCancel={() => setConfirmEdit(false)}
+                />
             )}
         </div>
     );
