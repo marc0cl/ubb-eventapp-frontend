@@ -102,10 +102,11 @@ const AuthPage = () => {
         setLoading(true);
 
         try {
-            const { confirmPassword, emailPrefix, emailDomain, ...rest } = registerData;
+            const { confirmPassword, emailPrefix, emailDomain, isExternal, ...rest } = registerData;
             const dataToSend = {
                 ...rest,
-                email
+                email,
+                isExternal
             };
             const data = await authService.register(dataToSend);
             localStorage.setItem('accessToken', data.accessToken);
