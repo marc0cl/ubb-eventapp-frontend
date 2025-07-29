@@ -336,7 +336,6 @@ const FriendsPage = () => {
     setActionLoading((prev) => ({ ...prev, [friendId]: true }));
     try {
       await userService.sendFriendRequest(userId, friendId);
-
       const recPromise = userService
         .getRecommendations(userId)
         .catch((err) => {
