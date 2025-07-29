@@ -35,11 +35,27 @@ const CalendarPage = () => {
             setUserId(uid);
 
             try {
-                const toAttend = await eventService.getEventsToAttend(uid);
+                const [toAttend, created] = await Promise.all([
+                    eventService.getEventsToAttend(uid),
+                    eventService.getEventsByCreator(uid)
+                ]);
+
+                let eventsList = created || [];
+
                 if (toAttend.eventIds && toAttend.eventIds.length > 0) {
-                    const data = await eventService.getEventsByIds(toAttend.eventIds);
-                    setEvents(data);
+                    const attendEvents = await eventService.getEventsByIds(toAttend.eventIds);
+                    eventsList = [...eventsList, ...attendEvents];
                 }
+
+                const unique = [];
+                const seen = new Set();
+                for (const ev of eventsList) {
+                    if (!seen.has(ev.id)) {
+                        unique.push(ev);
+                        seen.add(ev.id);
+                    }
+                }
+                setEvents(unique);
             } catch (err) {
                 console.error('Error fetching events', err);
             } finally {
@@ -107,13 +123,27 @@ const CalendarPage = () => {
     const refreshEvents = async () => {
         if (!userId) return;
         try {
-            const toAttend = await eventService.getEventsToAttend(userId);
+            const [toAttend, created] = await Promise.all([
+                eventService.getEventsToAttend(userId),
+                eventService.getEventsByCreator(userId)
+            ]);
+
+            let eventsList = created || [];
+
             if (toAttend.eventIds && toAttend.eventIds.length > 0) {
-                const data = await eventService.getEventsByIds(toAttend.eventIds);
-                setEvents(data);
-            } else {
-                setEvents([]);
+                const attendEvents = await eventService.getEventsByIds(toAttend.eventIds);
+                eventsList = [...eventsList, ...attendEvents];
             }
+
+            const unique = [];
+            const seen = new Set();
+            for (const ev of eventsList) {
+                if (!seen.has(ev.id)) {
+                    unique.push(ev);
+                    seen.add(ev.id);
+                }
+            }
+            setEvents(unique);
         } catch (err) {
             console.error('Error fetching events', err);
         }
