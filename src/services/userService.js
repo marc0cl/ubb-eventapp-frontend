@@ -17,6 +17,10 @@ const userService = {
         const res = await axiosInstance.get(`/users/${id}/recommendations`);
         return res.data;
     },
+    updateProfile: async (userData) => {
+        const res = await axiosInstance.put(`/users`, userData);
+        return res.data;
+    },
     getPendingFriendRequests: async (userId) => {
         const res = await axiosInstance.get(`/friendships/pending/${userId}`);
         return res.data;

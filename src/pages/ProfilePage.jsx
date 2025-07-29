@@ -11,12 +11,14 @@ import {
     CalendarPlus,
     Activity,
     ChevronLeft,
-    Star
+    Star,
+    Pencil
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UBB_COLORS } from '../styles/colors';
 import userService from '../services/userService';
 import { getUserIdFromToken } from '../utils/auth';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -24,6 +26,8 @@ const ProfilePage = () => {
     const [summary, setSummary] = useState(null);
     const [trophies, setTrophies] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [editOpen, setEditOpen] = useState(false);
+    const [formData, setFormData] = useState({ nombres: '', apellidos: '', username: '', fotoUrl: '' });
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -40,6 +44,12 @@ const ProfilePage = () => {
 
                 setUser(userData);
                 setSummary(summaryData);
+                setFormData({
+                    nombres: userData.nombres || '',
+                    apellidos: userData.apellidos || '',
+                    username: userData.username || '',
+                    fotoUrl: userData.fotoUrl || ''
+                });
 
                 if (summaryData.trophies && summaryData.trophies.length > 0) {
                     const trophyIds = summaryData.trophies.map(t =>
@@ -62,6 +72,32 @@ const ProfilePage = () => {
         `https://ui-avatars.com/api/?name=${encodeURIComponent(
             `${user?.nombres || ''} ${user?.apellidos || ''}`
         )}&background=${UBB_COLORS.primary.slice(1)}&color=ffffff&size=200`;
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleEditClose = () => setEditOpen(false);
+
+    const handleSave = async () => {
+        if (!user) return;
+        try {
+            const updated = await userService.updateProfile({
+                ...user,
+                nombres: formData.nombres,
+                apellidos: formData.apellidos,
+                username: formData.username,
+                fotoUrl: formData.fotoUrl,
+                campus: user.campus ? { id: user.campus.id || user.campus } : undefined
+            });
+            setUser(updated);
+            setSummary((s) => ({ ...s, username: updated.username }));
+            setEditOpen(false);
+        } catch (err) {
+            console.error('Error updating profile:', err);
+        }
+    };
 
     if (loading) {
         return (
@@ -128,9 +164,22 @@ const ProfilePage = () => {
                             }}
                         />
                         <div style={{ textAlign: window.innerWidth > 768 ? 'left' : 'center' }}>
-                            <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '8px' }}>
-                                {user ? `${user.nombres} ${user.apellidos}` : 'Cargando...'}
-                            </h1>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: window.innerWidth > 768 ? 'flex-start' : 'center' }}>
+                                <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '8px' }}>
+                                    {user ? `${user.nombres} ${user.apellidos}` : 'Cargando...'}
+                                </h1>
+                                <button
+                                    onClick={() => setEditOpen(true)}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: 'white',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    <Pencil size={20} />
+                                </button>
+                            </div>
                             <p style={{ fontSize: '20px', color: 'rgba(219,234,254,1)', marginBottom: '16px' }}>
                                 @{summary?.username || user?.username}
                             </p>
@@ -342,6 +391,57 @@ const ProfilePage = () => {
                     </div>
                 </div>
             </div>
+            <Dialog open={editOpen} onClose={handleEditClose} fullWidth maxWidth="sm">
+                <DialogTitle style={{ fontWeight: '600' }}>Editar Perfil</DialogTitle>
+                <DialogContent dividers style={{ padding: '24px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '4px' }}>Nombres</label>
+                            <input
+                                name="nombres"
+                                type="text"
+                                value={formData.nombres}
+                                onChange={handleInputChange}
+                                style={{ width: '100%', padding: '12px 16px', border: '1px solid #d1d5db', borderRadius: '8px' }}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '4px' }}>Apellidos</label>
+                            <input
+                                name="apellidos"
+                                type="text"
+                                value={formData.apellidos}
+                                onChange={handleInputChange}
+                                style={{ width: '100%', padding: '12px 16px', border: '1px solid #d1d5db', borderRadius: '8px' }}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '4px' }}>Nombre de usuario</label>
+                            <input
+                                name="username"
+                                type="text"
+                                value={formData.username}
+                                onChange={handleInputChange}
+                                style={{ width: '100%', padding: '12px 16px', border: '1px solid #d1d5db', borderRadius: '8px' }}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '4px' }}>Foto URL</label>
+                            <input
+                                name="fotoUrl"
+                                type="text"
+                                value={formData.fotoUrl}
+                                onChange={handleInputChange}
+                                style={{ width: '100%', padding: '12px 16px', border: '1px solid #d1d5db', borderRadius: '8px' }}
+                            />
+                        </div>
+                    </div>
+                </DialogContent>
+                <DialogActions style={{ padding: '16px' }}>
+                    <Button onClick={handleEditClose} style={{ textTransform: 'none', color: '#6b7280' }}>Cancelar</Button>
+                    <Button onClick={handleSave} variant="contained" style={{ textTransform: 'none', backgroundColor: UBB_COLORS.primary }}>Guardar</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };
