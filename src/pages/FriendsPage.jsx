@@ -334,8 +334,25 @@ const FriendsPage = () => {
     setActionLoading(prev => ({ ...prev, [friendId]: true }));
     try {
       await userService.sendFriendRequest(userId, friendId);
-      const rec = await userService.getRecommendations(userId);
-      setRecommendations(rec || []);
+      // Quitamos la recomendaci\u00f3n localmente antes de refrescar
+      setRecommendations((prev) => prev.filter((u) => u.id !== friendId));
+
+      const recPromise = userService
+        .getRecommendations(userId)
+        .catch((err) => {
+          console.error('Error refreshing recommendations:', err);
+          return null;
+        });
+      const pendPromise = userService
+        .getPendingFriendRequests(userId)
+        .catch((err) => {
+          console.error('Error refreshing pending requests:', err);
+          return null;
+        });
+
+      const [rec, pend] = await Promise.all([recPromise, pendPromise]);
+      if (rec) setRecommendations(rec.filter((u) => u.id !== friendId));
+      if (pend) setPending(pend);
     } catch (err) {
       console.error('Error sending friend request:', err);
     } finally {
