@@ -90,7 +90,11 @@ const eventService = {
         const events = response.data || [];
         const now = new Date();
         return events
-            .filter(ev => new Date(ev.fechaFin) >= now)
+            .filter(
+                ev =>
+                    ev.estadoValidacion !== 'PENDIENTE' &&
+                    new Date(ev.fechaFin) >= now
+            )
             .sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio));
     },
 
