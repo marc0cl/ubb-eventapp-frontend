@@ -120,30 +120,6 @@ const Dashboard = ({ onLogout }) => {
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <button style={{
-                                padding: '8px',
-                                borderRadius: '8px',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                transition: 'background-color 0.2s'
-                            }}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f3f4f6'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}>
-                                <Bell size={20} style={{ color: '#6b7280' }} />
-                            </button>
-                            <button style={{
-                                padding: '8px',
-                                borderRadius: '8px',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                transition: 'background-color 0.2s'
-                            }}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f3f4f6'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}>
-                                <Settings size={20} style={{ color: '#6b7280' }} />
-                            </button>
                             <button
                                 onClick={handleLogout}
                                 style={{

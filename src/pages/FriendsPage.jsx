@@ -313,14 +313,12 @@ const FriendsPage = () => {
         if (!uid) return;
         setUserId(uid);
 
-        const [rec, pend, fr] = await Promise.all([
+        const [rec, pend] = await Promise.all([
           userService.getRecommendations(uid),
-          userService.getPendingFriendRequests(uid),
-          userService.getFriends(uid)
+          userService.getPendingFriendRequests(uid)
         ]);
         setRecommendations(rec || []);
         setPending(pend || []);
-        setFriends(fr || []);
       } catch (err) {
         console.error('Error loading friends data:', err);
       } finally {
@@ -333,29 +331,15 @@ const FriendsPage = () => {
   const handleSendRequest = async (friendId) => {
     if (!userId || actionLoading[friendId]) return;
 
-    setActionLoading((prev) => ({ ...prev, [friendId]: true }));
+    setActionLoading(prev => ({ ...prev, [friendId]: true }));
     try {
       await userService.sendFriendRequest(userId, friendId);
-      const recPromise = userService
-        .getRecommendations(userId)
-        .catch((err) => {
-          console.error('Error refreshing recommendations:', err);
-          return null;
-        });
-      const pendPromise = userService
-        .getPendingFriendRequests(userId)
-        .catch((err) => {
-          console.error('Error refreshing pending requests:', err);
-          return null;
-        });
-
-      const [rec, pend] = await Promise.all([recPromise, pendPromise]);
-      if (rec) setRecommendations(rec);
-      if (pend) setPending(pend);
+      const rec = await userService.getRecommendations(userId);
+      setRecommendations(rec || []);
     } catch (err) {
       console.error('Error sending friend request:', err);
     } finally {
-      setActionLoading((prev) => ({ ...prev, [friendId]: false }));
+      setActionLoading(prev => ({ ...prev, [friendId]: false }));
     }
   };
 
@@ -382,20 +366,6 @@ const FriendsPage = () => {
       setPending((prev) => prev.filter((u) => u.id !== friendId));
     } catch (err) {
       console.error('Error rejecting friend request:', err);
-    } finally {
-      setActionLoading(prev => ({ ...prev, [friendId]: false }));
-    }
-  };
-
-  const handleDeleteFriend = async (friendId) => {
-    if (!userId || actionLoading[friendId]) return;
-
-    setActionLoading(prev => ({ ...prev, [friendId]: true }));
-    try {
-      await userService.deleteFriendship(userId, friendId);
-      setFriends((prev) => prev.filter((u) => u.id !== friendId));
-    } catch (err) {
-      console.error('Error deleting friendship:', err);
     } finally {
       setActionLoading(prev => ({ ...prev, [friendId]: false }));
     }
