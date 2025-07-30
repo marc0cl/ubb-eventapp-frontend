@@ -304,43 +304,39 @@ const TicketsPage = () => {
         }
     };
 
+    const load = async () => {
+        setLoading(true);
+        try {
+            const allTickets = await ticketService.getAllTickets();
+            const tickets = allTickets || [];
+
+            // Filtrar tickets por estado
+            const open = tickets.filter(ticket => ticket.estado === 'ABIERTO');
+            const closed = tickets.filter(ticket => ticket.estado === 'CERRADO');
+
+            setOpenTickets(open);
+            setClosedTickets(closed);
+        } catch (err) {
+            console.error('Error fetching tickets', err);
+            setOpenTickets([]);
+            setClosedTickets([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const load = async () => {
-            setLoading(true);
-            try {
-                const allTickets = await ticketService.getAllTickets();
-                const tickets = allTickets || [];
-
-                // Filtrar tickets por estado
-                const open = tickets.filter(ticket => ticket.estado === 'ABIERTO');
-                const closed = tickets.filter(ticket => ticket.estado === 'CERRADO');
-
-                setOpenTickets(open);
-                setClosedTickets(closed);
-            } catch (err) {
-                console.error('Error fetching tickets', err);
-                setOpenTickets([]);
-                setClosedTickets([]);
-            } finally {
-                setLoading(false);
-            }
-        };
         load();
     }, []);
 
-    const handleClose = async (id) => {
+    const handleClose = async () => {
         if (!selected) return;
-
+        const id = selected.id;
+        setClosing(true);
+        setSelected(null);
         try {
-            setClosing(true);
             await ticketService.closeTicket(id);
-
-            // Actualizar listas localmente después de cerrar
-            const updatedTicket = { ...ticketToMove, estado: 'CERRADO' };
-            setOpenTickets(prev => prev.filter(t => t.id !== id));
-            setClosedTickets(prev => [...prev, updatedTicket]);
-
-            setSelected(null);
+            await load();
         } catch (err) {
             console.error('Error closing ticket', err);
         } finally {
