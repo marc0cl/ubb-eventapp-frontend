@@ -8,10 +8,12 @@ const ticketService = {
         });
         return response.data;
     },
-    getOpenTickets: async () => {
+
+    getAllTickets: async () => {
         const response = await axiosInstance.get('/tickets');
         return response.data;
     },
+
     closeTicket: async (ticketId) => {
         const response = await axiosInstance.post(`/tickets/${ticketId}/close`);
         return response.data;
