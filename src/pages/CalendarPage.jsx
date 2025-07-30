@@ -118,12 +118,15 @@ const CalendarPage = () => {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
             border: '1px solid #e5e7eb',
             position: 'relative',
-            minHeight: '600px'
+            height: '800px', // Fixed height instead of minHeight
+            overflow: 'hidden'
         },
         timelineContent: {
             position: 'relative',
             height: '100%',
-            padding: '16px'
+            padding: '16px',
+            overflowY: 'auto',
+            overflowX: 'hidden'
         },
         hourLine: {
             position: 'absolute',
@@ -172,16 +175,14 @@ const CalendarPage = () => {
         },
         eventCard: {
             position: 'absolute',
-            left: '88px',
-            right: '24px',
             backgroundColor: `${UBB_COLORS.primary}08`,
             border: `1px solid ${UBB_COLORS.primary}30`,
             borderLeft: `4px solid ${UBB_COLORS.primary}`,
             borderRadius: '8px',
-            padding: '12px 16px',
+            padding: '8px 12px',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            minHeight: '60px',
+            minHeight: '40px',
             overflow: 'hidden',
             boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
         },
@@ -200,9 +201,12 @@ const CalendarPage = () => {
         eventTitle: {
             fontWeight: '600',
             color: '#1f2937',
-            marginBottom: '4px',
+            marginBottom: '2px',
             fontSize: '14px',
-            lineHeight: '1.3'
+            lineHeight: '1.2',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
         },
         eventMeta: {
             fontSize: '12px',
@@ -510,6 +514,52 @@ const CalendarPage = () => {
     // Generate visible hours (6 AM to 10 PM)
     const visibleHours = Array.from({ length: 17 }, (_, i) => i + 6);
 
+    // Calculate event columns to handle overlapping events
+    const calculateEventColumns = (events) => {
+        const sortedEvents = [...events].sort((a, b) =>
+            new Date(a.fechaInicio) - new Date(b.fechaInicio)
+        );
+
+        const columns = [];
+
+        sortedEvents.forEach(event => {
+            let placed = false;
+            const eventStart = new Date(event.fechaInicio).getTime();
+            const eventEnd = new Date(event.fechaFin).getTime();
+
+            // Try to place in existing columns
+            for (let i = 0; i < columns.length; i++) {
+                const lastEventInColumn = columns[i][columns[i].length - 1];
+                const lastEventEnd = new Date(lastEventInColumn.fechaFin).getTime();
+
+                if (lastEventEnd <= eventStart) {
+                    columns[i].push(event);
+                    placed = true;
+                    break;
+                }
+            }
+
+            // Create new column if needed
+            if (!placed) {
+                columns.push([event]);
+            }
+        });
+
+        // Assign column info to events
+        const eventsWithColumns = [];
+        columns.forEach((column, columnIndex) => {
+            column.forEach(event => {
+                eventsWithColumns.push({
+                    ...event,
+                    column: columnIndex,
+                    totalColumns: columns.length
+                });
+            });
+        });
+
+        return eventsWithColumns;
+    };
+
     const refreshEvents = async () => {
         if (!userId) return;
         try {
@@ -612,8 +662,12 @@ const CalendarPage = () => {
         setCalendarOpen(false);
     };
 
-    const EventCard = ({ event, isPast }) => {
+    const EventCard = ({ event, isPast, column, totalColumns }) => {
         const [isHovered, setIsHovered] = useState(false);
+
+        // Calculate width and position based on columns
+        const width = `calc((100% - 88px) / ${totalColumns} - 8px)`;
+        const left = `calc(88px + (100% - 88px) * ${column} / ${totalColumns} + 4px)`;
 
         return (
             <div
@@ -622,7 +676,11 @@ const CalendarPage = () => {
                     ...(isPast ? styles.pastEventCard : {}),
                     ...(isHovered && !isPast ? styles.eventCardHover : {}),
                     top: `${getHourPosition(event.fechaInicio)}%`,
-                    height: `${Math.max(60, getEventDuration(event.fechaInicio, event.fechaFin))}px`
+                    height: `${Math.max(60, getEventDuration(event.fechaInicio, event.fechaFin))}px`,
+                    left: left,
+                    right: 'auto',
+                    width: width,
+                    zIndex: isHovered ? 20 : 5
                 }}
                 onClick={() => !isPast && handleEventClick(event)}
                 onMouseEnter={() => setIsHovered(true)}
@@ -630,7 +688,8 @@ const CalendarPage = () => {
             >
                 <h4 style={{
                     ...styles.eventTitle,
-                    color: isPast ? '#6b7280' : '#1f2937'
+                    color: isPast ? '#6b7280' : '#1f2937',
+                    fontSize: totalColumns > 2 ? '12px' : '14px'
                 }}>
                     {event.titulo}
                 </h4>
@@ -639,18 +698,24 @@ const CalendarPage = () => {
                     color: isPast ? '#9ca3af' : '#6b7280'
                 }}>
                     <div style={styles.metaItem}>
-                        <Clock size={12} />
-                        <span>{formatTime(event.fechaInicio)} - {formatTime(event.fechaFin)}</span>
+                        <Clock size={totalColumns > 2 ? 10 : 12} />
+                        <span style={{ fontSize: totalColumns > 2 ? '11px' : '12px' }}>
+                            {formatTime(event.fechaInicio)} - {formatTime(event.fechaFin)}
+                        </span>
                     </div>
-                    <div style={styles.metaItem}>
-                        <MapPin size={12} />
-                        <span>{event.lugar}</span>
-                    </div>
-                    {event.aforoMax && (
-                        <div style={styles.metaItem}>
-                            <Users size={12} />
-                            <span>Aforo: {event.aforoMax}</span>
-                        </div>
+                    {totalColumns <= 2 && (
+                        <>
+                            <div style={styles.metaItem}>
+                                <MapPin size={12} />
+                                <span style={{ fontSize: '12px' }}>{event.lugar}</span>
+                            </div>
+                            {event.aforoMax && (
+                                <div style={styles.metaItem}>
+                                    <Users size={12} />
+                                    <span style={{ fontSize: '12px' }}>Aforo: {event.aforoMax}</span>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
@@ -796,13 +861,18 @@ const CalendarPage = () => {
                             )}
 
                             {/* Eventos */}
-                            {todayEvents.map(event => (
-                                <EventCard
-                                    key={event.id}
-                                    event={event}
-                                    isPast={isPastEvent(event.fechaFin)}
-                                />
-                            ))}
+                            {(() => {
+                                const eventsWithColumns = calculateEventColumns(todayEvents);
+                                return eventsWithColumns.map(event => (
+                                    <EventCard
+                                        key={event.id}
+                                        event={event}
+                                        isPast={isPastEvent(event.fechaFin)}
+                                        column={event.column}
+                                        totalColumns={event.totalColumns}
+                                    />
+                                ));
+                            })()}
                         </div>
                     </div>
                 )}
