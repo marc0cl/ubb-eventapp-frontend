@@ -87,7 +87,11 @@ const eventService = {
 
     getPublicEvents: async () => {
         const response = await axiosInstance.get(`/events/public`);
-        return response.data;
+        const events = response.data || [];
+        const now = new Date();
+        return events
+            .filter(ev => new Date(ev.fechaFin) >= now)
+            .sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio));
     },
 
     clearUpcomingCache: () => {

@@ -42,7 +42,7 @@ const Dashboard = ({ onLogout }) => {
                 const [userData, summaryData, eventsData] = await Promise.all([
                     userService.getUser(userId),
                     userService.getSummary(userId),
-                    eventService.getUpcomingEvents()
+                    eventService.getPublicEvents()
                 ]);
 
                 setUserName(userData.nombres);
