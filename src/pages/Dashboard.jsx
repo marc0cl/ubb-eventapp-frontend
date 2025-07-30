@@ -17,31 +17,38 @@ import authService from '../services/authService';
 import eventService from '../services/eventService';
 import userService from '../services/userService';
 import { UBB_COLORS } from '../styles/colors';
-import { getUserIdFromToken } from '../utils/auth';
+import { getUserIdFromToken, getRoleFromToken } from '../utils/auth';
+import ticketService from '../services/ticketService';
 
 const Dashboard = ({ onLogout }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [userName, setUserName] = useState('');
+    const [role, setRole] = useState('');
+    const [userId, setUserId] = useState(null);
     const [upcomingEvents, setUpcomingEvents] = useState([]);
     const [stats, setStats] = useState({
         eventsToAttend: 0,
         friendsCount: 0,
         eventsAttended: 0
     });
+    const [ticketModal, setTicketModal] = useState(false);
+    const [ticketDesc, setTicketDesc] = useState('');
 
     useEffect(() => {
         const loadDashboardData = async () => {
             const token = localStorage.getItem('accessToken');
             if (!token) return;
 
-            const userId = getUserIdFromToken(token);
-            if (!userId) return;
+            const uid = getUserIdFromToken(token);
+            if (!uid) return;
+            setUserId(uid);
+            setRole(getRoleFromToken(token));
 
             try {
                 const [userData, summaryData, eventsData] = await Promise.all([
-                    userService.getUser(userId),
-                    userService.getSummary(userId),
+                    userService.getUser(uid),
+                    userService.getSummary(uid),
                     eventService.getPublicEvents()
                 ]);
 
@@ -72,6 +79,17 @@ const Dashboard = ({ onLogout }) => {
             navigate('/');
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
+        }
+    };
+
+    const handleCreateTicket = async () => {
+        if (!ticketDesc.trim()) return;
+        try {
+            await ticketService.openTicket(ticketDesc, userId);
+            setTicketDesc('');
+            setTicketModal(false);
+        } catch (err) {
+            console.error('Error creating ticket', err);
         }
     };
 
@@ -120,6 +138,25 @@ const Dashboard = ({ onLogout }) => {
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <button
+                                onClick={() => setTicketModal(true)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    backgroundColor: UBB_COLORS.primary,
+                                    color: 'white',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    transition: 'background-color 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                                onMouseLeave={(e) => e.target.style.backgroundColor = UBB_COLORS.primary}
+                            >
+                                <span>Levantar Ticket</span>
+                            </button>
                             <button
                                 onClick={handleLogout}
                                 style={{
@@ -204,12 +241,18 @@ const Dashboard = ({ onLogout }) => {
                 <div style={{ marginBottom: '32px' }}>
                     <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '16px' }}>Acceso rápido</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
-                        {[
-                            { icon: Calendar, title: 'Mi Calendario', desc: 'Ver todos mis eventos programados', path: '/calendar', color: UBB_COLORS.primary },
-                            { icon: CalendarDays, title: 'Explorar Eventos', desc: 'Descubre nuevas actividades', path: '/events', color: UBB_COLORS.secondary },
-                            { icon: User, title: 'Mi Perfil', desc: 'Ver logros y estadísticas', path: '/profile', color: '#8B5CF6' },
-                            { icon: Users, title: 'Comunidad', desc: 'Conecta con otros estudiantes', path: '/friends', color: '#10B981' }
-                        ].map((item, index) => (
+                        {(() => {
+                            const items = [
+                                { icon: Calendar, title: 'Mi Calendario', desc: 'Ver todos mis eventos programados', path: '/calendar', color: UBB_COLORS.primary },
+                                { icon: CalendarDays, title: 'Explorar Eventos', desc: 'Descubre nuevas actividades', path: '/events', color: UBB_COLORS.secondary },
+                                { icon: User, title: 'Mi Perfil', desc: 'Ver logros y estadísticas', path: '/profile', color: '#8B5CF6' },
+                                { icon: Users, title: 'Comunidad', desc: 'Conecta con otros estudiantes', path: '/friends', color: '#10B981' }
+                            ];
+                            if (role === 'MODERADOR' || role === 'ADMINISTRADOR') {
+                                items.push({ icon: Settings, title: 'Tickets', desc: 'Gestionar reportes', path: '/tickets', color: UBB_COLORS.primary });
+                            }
+                            return items;
+                        })().map((item, index) => (
                             <button
                                 key={index}
                                 onClick={() => navigate(item.path)}
@@ -338,6 +381,18 @@ const Dashboard = ({ onLogout }) => {
                     </div>
                 </div>
             </main>
+            {ticketModal && (
+                <div style={{ position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.3)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }} onClick={(e)=>{if(e.target===e.currentTarget)setTicketModal(false);}}>
+                    <div style={{ background:'white', borderRadius:'8px', padding:'24px', width:'90%', maxWidth:'500px' }}>
+                        <h2 style={{ fontWeight:'600', marginBottom:'12px' }}>Nuevo Ticket</h2>
+                        <textarea value={ticketDesc} onChange={e=>setTicketDesc(e.target.value)} rows="4" style={{ width:'100%', border:'1px solid #e5e7eb', borderRadius:'6px', padding:'8px' }} />
+                        <div style={{ display:'flex', justifyContent:'flex-end', gap:'8px', marginTop:'16px' }}>
+                            <button onClick={()=>setTicketModal(false)} style={{ padding:'8px 16px', border:'none', borderRadius:'6px', background:'#e5e7eb', color:'#374151', cursor:'pointer' }}>Cancelar</button>
+                            <button onClick={handleCreateTicket} style={{ padding:'8px 16px', border:'none', borderRadius:'6px', background:UBB_COLORS.primary, color:'white', cursor:'pointer' }}>Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
