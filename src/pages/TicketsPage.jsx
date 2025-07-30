@@ -11,26 +11,29 @@ const TicketsPage = () => {
     const [selected, setSelected] = useState(null);
     const [closing, setClosing] = useState(false);
 
+    const load = async () => {
+        try {
+            const data = await ticketService.getOpenTickets();
+            setTickets(data || []);
+        } catch (err) {
+            console.error('Error fetching tickets', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const load = async () => {
-            try {
-                const data = await ticketService.getOpenTickets();
-                setTickets(data || []);
-            } catch (err) {
-                console.error('Error fetching tickets', err);
-            } finally {
-                setLoading(false);
-            }
-        };
         load();
     }, []);
 
-    const handleClose = async (id) => {
+    const handleClose = async () => {
+        if (!selected) return;
+        const id = selected.id;
+        setClosing(true);
+        setSelected(null);
         try {
-            setClosing(true);
             await ticketService.closeTicket(id);
-            setTickets(tickets.filter(t => t.id !== id));
-            setSelected(null);
+            await load();
         } catch (err) {
             console.error('Error closing ticket', err);
         } finally {
@@ -105,7 +108,7 @@ const TicketsPage = () => {
                             >Cerrar</button>
                             <button
                                 style={{ ...styles.button, backgroundColor:UBB_COLORS.primary, color:'white' }}
-                                onClick={() => handleClose(selected.id)}
+                                onClick={handleClose}
                                 disabled={closing}
                             >{closing ? 'Cerrando...' : 'Marcar como resuelto'}</button>
                         </div>
