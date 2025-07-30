@@ -312,11 +312,16 @@ const FriendsPage = () => {
         const uid = getUserIdFromToken(token);
         if (!uid) return;
         setUserId(uid);
-        const rec = await userService.getRecommendations(uid)
-        const pend = await userService.getPendingFriendRequests(uid)
+
+        const [rec, pend, fr] = await Promise.all([
+          userService.getRecommendations(uid),
+          userService.getPendingFriendRequests(uid),
+          userService.getFriends(uid)
+        ]);
+
         setPending(pend || []);
         setRecommendations(rec || []);
-
+        setFriends(fr || []);
       } catch (err) {
         console.error('Error loading friends data:', err);
       } finally {
@@ -365,6 +370,8 @@ const FriendsPage = () => {
     try {
       await userService.acceptFriendRequest(userId, friendId);
       setPending((prev) => prev.filter((u) => u.id !== friendId));
+      const updatedFriends = await userService.getFriends(userId);
+      setFriends(updatedFriends || []);
     } catch (err) {
       console.error('Error accepting friend request:', err);
     } finally {
@@ -381,6 +388,20 @@ const FriendsPage = () => {
       setPending((prev) => prev.filter((u) => u.id !== friendId));
     } catch (err) {
       console.error('Error rejecting friend request:', err);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [friendId]: false }));
+    }
+  };
+
+  const handleDeleteFriend = async (friendId) => {
+    if (!userId || actionLoading[friendId]) return;
+
+    setActionLoading(prev => ({ ...prev, [friendId]: true }));
+    try {
+      await userService.deleteFriendship(userId, friendId);
+      setFriends((prev) => prev.filter((u) => u.id !== friendId));
+    } catch (err) {
+      console.error('Error deleting friend:', err);
     } finally {
       setActionLoading(prev => ({ ...prev, [friendId]: false }));
     }
