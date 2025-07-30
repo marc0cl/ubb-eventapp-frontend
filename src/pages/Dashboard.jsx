@@ -46,19 +46,28 @@ const Dashboard = ({ onLogout }) => {
             setRole(getRoleFromToken(token));
 
             try {
-                const [userData, summaryData, eventsData] = await Promise.all([
+                const [userData, summaryData, eventsData, toAttendData] = await Promise.all([
                     userService.getUser(uid),
                     userService.getSummary(uid),
-                    eventService.getPublicEvents()
+                    eventService.getPublicEvents(),
+                    eventService.getEventsToAttend(uid)
                 ]);
 
                 setUserName(userData.nombres);
                 const createdCount = summaryData.events?.eventsCreated || 0;
                 const toAttendCount = summaryData.events?.eventsToAttend || 0;
+
+                let pastAttended = 0;
+                if (toAttendData.eventIds && toAttendData.eventIds.length > 0) {
+                    const attendEvents = await eventService.getEventsByIds(toAttendData.eventIds);
+                    const now = new Date();
+                    pastAttended = attendEvents.filter(ev => new Date(ev.fechaFin) < now).length;
+                }
+
                 setStats({
-                    eventsToAttend: toAttendCount + createdCount,
+                    eventsToAttend: toAttendCount + createdCount - pastAttended,
                     friendsCount: summaryData.friendsCount || 0,
-                    eventsAttended: summaryData.events?.eventsAttended || 0
+                    eventsAttended: (summaryData.events?.eventsAttended || 0) + pastAttended
                 });
 
                 setUpcomingEvents(eventsData.slice(0, 3));
