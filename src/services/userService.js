@@ -23,13 +23,7 @@ const userService = {
     },
     getPendingFriendRequests: async (userId) => {
         const res = await axiosInstance.get(`/friendships/pending/${userId}`);
-        const data = res.data || [];
-        // API devuelve objetos de amistad con user1 y user2
-        // Filtramos para obtener solo las solicitudes donde el usuario actual
-        // es el receptor (user2)
-        return data
-            .filter((f) => f.user2 && f.user2.id === userId && f.user1)
-            .map((f) => f.user1);
+        return res.data;
     },
     getFriends: async (userId) => {
         const res = await axiosInstance.get(`/friendships/friends/${userId}`);

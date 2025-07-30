@@ -312,13 +312,11 @@ const FriendsPage = () => {
         const uid = getUserIdFromToken(token);
         if (!uid) return;
         setUserId(uid);
-
-        const [rec, pend] = await Promise.all([
-          userService.getRecommendations(uid),
-          userService.getPendingFriendRequests(uid)
-        ]);
-        setRecommendations(rec || []);
+        const rec = await userService.getRecommendations(uid)
+        const pend = await userService.getPendingFriendRequests(uid)
         setPending(pend || []);
+        setRecommendations(rec || []);
+
       } catch (err) {
         console.error('Error loading friends data:', err);
       } finally {
