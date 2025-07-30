@@ -36,7 +36,7 @@ const userService = {
         return res.data;
     },
     sendFriendRequest: async (user1, user2) => {
-        const res = await axiosInstance.post(`/friendships`, { friendship: {  user1, user2 } });
+        const res = await axiosInstance.post(`/friendships/${user1}/${user2}`);
         return res.data;
     },
     acceptFriendRequest: async (userId, friendId) => {
