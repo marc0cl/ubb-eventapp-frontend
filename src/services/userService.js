@@ -39,18 +39,16 @@ const userService = {
         const res = await axiosInstance.post(`/friendships/${user1}/${user2}`);
         return res.data;
     },
-    acceptFriendRequest: async (userId, friendId) => {
-        const res = await axiosInstance.post(`/friendships/accept`, {
-            userId,
-            friendId
-        });
+    acceptFriendRequest: async (user1Id, user2Id) => {
+        const res = await axiosInstance.post(
+            `/friendships/${user1Id}/${user2Id}/accept`
+        );
         return res.data;
     },
-    rejectFriendRequest: async (userId, friendId) => {
-        const res = await axiosInstance.post(`/friendships/reject`, {
-            userId,
-            friendId
-        });
+    rejectFriendRequest: async (user1Id, user2Id) => {
+        const res = await axiosInstance.post(
+            `/friendships/${user1Id}/${user2Id}/reject`
+        );
         return res.data;
     },
     deleteFriendship: async (userId, friendId) => {
