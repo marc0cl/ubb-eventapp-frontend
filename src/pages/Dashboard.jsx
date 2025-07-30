@@ -27,6 +27,7 @@ const Dashboard = ({ onLogout }) => {
     const [role, setRole] = useState('');
     const [userId, setUserId] = useState(null);
     const [upcomingEvents, setUpcomingEvents] = useState([]);
+    const [pendingRequests, setPendingRequests] = useState(0);
     const [stats, setStats] = useState({
         eventsToAttend: 0,
         friendsCount: 0,
@@ -46,10 +47,11 @@ const Dashboard = ({ onLogout }) => {
             setRole(getRoleFromToken(token));
 
             try {
-                const [userData, summaryData, eventsData] = await Promise.all([
+                const [userData, summaryData, eventsData, pending] = await Promise.all([
                     userService.getUser(uid),
                     userService.getSummary(uid),
-                    eventService.getPublicEvents()
+                    eventService.getPublicEvents(),
+                    userService.getPendingFriendRequests(uid)
                 ]);
 
                 setUserName(userData.nombres);
@@ -62,6 +64,7 @@ const Dashboard = ({ onLogout }) => {
                 });
 
                 setUpcomingEvents(eventsData.slice(0, 3));
+                setPendingRequests((pending || []).length);
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
             } finally {
@@ -246,7 +249,7 @@ const Dashboard = ({ onLogout }) => {
                                 { icon: Calendar, title: 'Mi Calendario', desc: 'Ver todos mis eventos programados', path: '/calendar', color: UBB_COLORS.primary },
                                 { icon: CalendarDays, title: 'Explorar Eventos', desc: 'Descubre nuevas actividades', path: '/events', color: UBB_COLORS.secondary },
                                 { icon: User, title: 'Mi Perfil', desc: 'Ver logros y estadísticas', path: '/profile', color: '#8B5CF6' },
-                                { icon: Users, title: 'Comunidad', desc: 'Conecta con otros estudiantes', path: '/friends', color: '#10B981' }
+                                { icon: Users, title: 'Comunidad', desc: 'Conecta con otros estudiantes', path: '/friends', color: '#10B981', badge: pendingRequests }
                             ];
                             if (role === 'MODERADOR' || role === 'ADMINISTRADOR') {
                                 items.push({ icon: Settings, title: 'Tickets', desc: 'Gestionar reportes', path: '/tickets', color: UBB_COLORS.primary });
@@ -265,7 +268,8 @@ const Dashboard = ({ onLogout }) => {
                                     cursor: 'pointer',
                                     textAlign: 'left',
                                     width: '100%',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s',
+                                    position: 'relative'
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)';
@@ -286,6 +290,23 @@ const Dashboard = ({ onLogout }) => {
                                     </div>
                                     <ChevronRight size={20} style={{ color: '#9ca3af' }} />
                                 </div>
+                                {item.badge > 0 && (
+                                    <span
+                                        style={{
+                                            position: 'absolute',
+                                            top: '8px',
+                                            right: '8px',
+                                            backgroundColor: '#dc2626',
+                                            color: 'white',
+                                            padding: '2px 6px',
+                                            borderRadius: '9999px',
+                                            fontSize: '12px',
+                                            fontWeight: '600'
+                                        }}
+                                    >
+                                        {item.badge > 99 ? '99+' : item.badge}
+                                    </span>
+                                )}
                                 <h3 style={{ fontWeight: '600', color: '#1f2937', marginBottom: '4px' }}>{item.title}</h3>
                                 <p style={{ fontSize: '14px', color: '#6b7280' }}>{item.desc}</p>
                             </button>
