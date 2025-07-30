@@ -410,7 +410,7 @@ const EventsPage = () => {
                 setRole(userRole);
                 setUserId(uid);
 
-                const all = await eventService.getUpcomingEvents();
+                const all = await eventService.getPublicEvents();
                 setEvents(all.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio)));
                 setPage(1);
 
@@ -434,7 +434,7 @@ const EventsPage = () => {
     }, []);
 
     const refreshAll = async () => {
-        const all = await eventService.getUpcomingEvents();
+        const all = await eventService.getPublicEvents();
         setEvents(all.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio)));
         setPage(1);
         if (userId) {
